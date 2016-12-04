@@ -91,24 +91,6 @@ resources:
             AttributeType: S
           - AttributeName: id
             AttributeType: S
-          # - AttributeName: author
-          #   AttributeType: S
-          # - AttributeName: brief
-          #   AttributeType: S
-          # - AttributeName: content
-          #   AttributeType: S
-          # - AttributeName: datePublished
-          #   AttributeType: S
-          # - AttributeName: issue
-          #   AttributeType: S
-          # - AttributeName: series
-          #   AttributeType: S
-          # - AttributeName: tags
-          #   AttributeType: S
-          # - AttributeName: title
-          #   AttributeType: S
-          # - AttributeName: url
-          #   AttributeType: S
         KeySchema:
           - AttributeName: publication
             KeyType: HASH
@@ -117,12 +99,3 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#    NewOutput:
-#      Description: "Description for the output"
-#      Value: "Some output value"
