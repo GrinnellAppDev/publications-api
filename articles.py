@@ -26,6 +26,36 @@ def create_response(status_code, headers={}, res=None, err=None):
         "headers": resp_headers
     }
 
+def get(event,context):
+    db = boto3.resource("dynamodb")
+    articles_table = db.Table("Articles")
+    publications_table = db.Table("Publications")
+
+    item = json.loads(event["body"])
+    path_params = event["pathParameters"]
+    publication_id = path_params["publicationId"]
+    article_id = path_params["articleId"]
+
+    # todo: validate the item with to a schema
+
+    publication_get = publications_table.get_item(
+        Key={"id": article_id, "publication": publication_id},
+        ProjectionExpression="id"
+    )
+
+    if "Item" not in publication_get:
+        err = Exception("No publication with id: {}".format(publication_id))
+        return create_response(404, err=err)
+
+    articles_get = articles_table.get_item(
+        Key={"id": article_id, "article": article_id}
+    )
+
+    if "Item" not in articles_get:
+        err = Exception("No article with id: {}".format(article_id))
+        return create_response(404, err=err)
+    return articles_get
+
 
 def post(event, context):
     """

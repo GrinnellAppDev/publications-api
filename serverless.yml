@@ -62,6 +62,11 @@ functions:
     description: Create a new article.
     events:
       - http: POST /publications/{publicationId}/articles
+  articles_get:
+    handler: articles.get
+    desription: Get an article through an ID
+    events:
+    - http: GET /publications/{publicationId}/articles/{articleId}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
