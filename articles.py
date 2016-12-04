@@ -45,7 +45,6 @@ def get(event, context):
     articles_table = db.Table("Articles")
     publications_table = db.Table("Publications")
 
-    item = json.loads(event["body"])
     path_params = event["pathParameters"]
     publication_id = path_params["publicationId"]
     article_id = path_params["articleId"]
@@ -53,7 +52,7 @@ def get(event, context):
     # todo: validate the item with to a schema
 
     publication_get = publications_table.get_item(
-        Key={"id": article_id, "publication": publication_id},
+        Key={"id": publication_id},
         ProjectionExpression="id"
     )
 

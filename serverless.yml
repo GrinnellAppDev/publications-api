@@ -66,7 +66,7 @@ functions:
     handler: articles.get
     desription: Get an article through an ID
     events:
-    - http: GET /publications/{publicationId}/articles/{articleId}
+      - http: GET /publications/{publicationId}/articles/{articleId}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -101,6 +101,19 @@ resources:
             KeyType: HASH
           - AttributeName: id
             KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    PublicationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: publications_publications
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
