@@ -7,13 +7,16 @@ import datetime
 import decimal
 from boto3.dynamodb.conditions import Key, Attr
 
-#Helper class to convert from DynamoDb object to JSON 
+
 class DecimalEncoder(json.JSONEncoder):
+    """
+    Helper class to convert from DynamoDb object to JSON.
+    """
+
     def default(self, o):
         if isinstance(o, decimal.Decimal):
             return str(o)
         return super(DecimalEncoder, self).default(o)
-
 
 
 def create_response(status_code, headers={}, res=None, err=None):
@@ -74,17 +77,17 @@ def post(event, context):
     return create_response(204, {"x-id": item_id})
 
 
-
 dynamodb = boto3.resource('dynamodb')
 
 table = dynamodb.Table('Articles')
 
-def lambda_handler(event,context):
-    #print(get_articles("my-pub-id")['title'])
-    
+
+def lambda_handler(event, context):
+    # print(get_articles("my-pub-id")['title'])
+
     response = table.get_item(
         Key={'publication id': publication_id,
-              'id': article_id}
+             'id': article_id}
     )
     item = response[table]
     print(item)
