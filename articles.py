@@ -39,7 +39,8 @@ def create_response(status_code, headers={}, res=None, err=None):
         "headers": resp_headers
     }
 
-def get(event,context):
+
+def get(event, context):
     db = boto3.resource("dynamodb")
     articles_table = db.Table("Articles")
     publications_table = db.Table("Publications")
@@ -105,19 +106,3 @@ def post(event, context):
     articles_table.put_item(Item=item)
 
     return create_response(204, {"x-id": item_id})
-
-
-dynamodb = boto3.resource('dynamodb')
-
-table = dynamodb.Table('Articles')
-
-
-def lambda_handler(event, context):
-    # print(get_articles("my-pub-id")['title'])
-
-    response = table.get_item(
-        Key={'publication id': publication_id,
-             'id': article_id}
-    )
-    item = response[table]
-    print(item)
