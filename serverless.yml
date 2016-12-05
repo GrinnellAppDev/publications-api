@@ -1,7 +1,20 @@
 ##
 # serverless.yml
 #
-# Created by Zander Otavka on 12/3/16
+# Copyright (C) 2016  Grinnell AppDev.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
 # Welcome to Serverless!
@@ -48,25 +61,25 @@ provider:
 #    variable1: value1
 
 # you can add packaging information here
-#package:
+package:
 #  include:
 #    - include-me.py
 #    - include-me-dir/**
-#  exclude:
-#    - exclude-me.py
-#    - exclude-me-dir/**
+  exclude:
+    - .idea/**
+    - test-events/**
 
 functions:
-  articles_post:
-    handler: articles.post
-    description: Create a new article.
-    events:
-      - http: POST /publications/{publicationId}/articles
   articles_get:
-    handler: articles.get
+    handler: main.articles_get
     desription: Get an article through an ID
     events:
       - http: GET /publications/{publicationId}/articles/{articleId}
+  articles_post:
+    handler: main.articles_post
+    description: Create a new article.
+    events:
+      - http: POST /publications/{publicationId}/articles
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
