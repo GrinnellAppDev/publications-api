@@ -20,11 +20,12 @@ You should only need to do this when requirements.txt is changed.
 To deploy the whole project for testing (only do this if you change serverless.yml):
 `serverless deploy -v`.
 
-To deploy a particular funtion (replace FUNCTION_NAME with the actual name):
+To deploy a particular funtion (replace `FUNCTION_NAME` with the actual name
+in the correct casing):
 `serverless deploy function -f FUNCTION_NAME`.
 
 ### Test Functions
-You should edit/create test-events/FUNCTION_NAME.json for whatever function you want to test.
+You should edit/create `test-events/FUNCTION_NAME.json` for whatever function you want to test.
 To test a function with that input data, first deploy it, then run:
 `serverless invoke -f FUNCTION_NAME -p test-events/FUNCTION_NAME.json -l`.
 
