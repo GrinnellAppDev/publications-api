@@ -1,5 +1,5 @@
 ##
-# main.py
+# publications/__init__.py
 #
 # Copyright (C) 2016  Grinnell AppDev.
 #
@@ -17,18 +17,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+
 from __future__ import print_function, division
 
-import os
-import sys
+from db import Db
 
-# directories to be exposed so the modules they contain can be imported
-GLOBAL_DIRS = ["shared", "lib"]
+import getlist
 
-# add each of GLOBAL_DIRS to sys.path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.extend([os.path.join(current_dir, gdir) for gdir in GLOBAL_DIRS])
+db = Db()
 
-# now that imports are properly configured, we can import our code
-from articles import articles_get, articles_post  # nopep8
-from publications import publications_list  # nopep8
+
+def publications_list(event, context):
+    return getlist.handler(event, context, db)

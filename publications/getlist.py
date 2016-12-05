@@ -1,5 +1,5 @@
 ##
-# main.py
+# publications/getlist.py
 #
 # Copyright (C) 2016  Grinnell AppDev.
 #
@@ -19,16 +19,17 @@
 
 from __future__ import print_function, division
 
-import os
-import sys
+from response import create_response
 
-# directories to be exposed so the modules they contain can be imported
-GLOBAL_DIRS = ["shared", "lib"]
 
-# add each of GLOBAL_DIRS to sys.path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.extend([os.path.join(current_dir, gdir) for gdir in GLOBAL_DIRS])
+def handler(event, context, db):
+    assert event["httpMethod"] == "GET"
 
-# now that imports are properly configured, we can import our code
-from articles import articles_get, articles_post  # nopep8
-from publications import publications_list  # nopep8
+    publications_get = db.publications.scan()
+
+    if "Items" in publications_get:
+        publications_list = publications_get["Items"]
+    else:
+        publications_list = []
+
+    return create_response(200, res=publications_list)

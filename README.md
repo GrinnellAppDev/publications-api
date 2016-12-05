@@ -21,7 +21,7 @@ To deploy the whole project for testing (only do this if you change serverless.y
 `serverless deploy -v`.
 
 To deploy a particular funtion (replace FUNCTION_NAME with the actual name):
-`serverless deploy function -f FUNCTION_NAME -v`.
+`serverless deploy function -f FUNCTION_NAME`.
 
 ### Test Functions
 You should edit/create test-events/FUNCTION_NAME.json for whatever function you want to test.

@@ -23,6 +23,8 @@ from response import create_response
 
 
 def handler(event, context, db):
+    assert event["httpMethod"] == "GET"
+
     path_params = event["pathParameters"]
     publication_id = path_params["publicationId"]
     article_id = path_params["articleId"]
@@ -44,4 +46,4 @@ def handler(event, context, db):
         err = Exception("No article with id: {}".format(article_id))
         return create_response(404, err=err)
 
-    return articles_get["Item"]
+    return create_response(200, res=articles_get["Item"])

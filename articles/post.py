@@ -27,11 +27,6 @@ from response import create_response
 
 
 def handler(event, context, db):
-    """
-    Handle a post request.
-
-    Validate the content, create a UUID, and then write to the database.
-    """
     assert event["httpMethod"] == "POST"
 
     item = json.loads(event["body"])
@@ -56,4 +51,10 @@ def handler(event, context, db):
 
     db.articles.put_item(Item=item)
 
-    return create_response(204, {"x-id": item_id})
+    assert event["path"][-1] != "/"
+
+    headers = {
+        "Location": "{}/{}".format(event["path"], item_id)
+    }
+
+    return create_response(201, headers, res=item)
