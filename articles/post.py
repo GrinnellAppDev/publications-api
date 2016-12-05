@@ -33,7 +33,7 @@ def handler(event, context, db):
     path_params = event["pathParameters"]
     publication_id = path_params["publicationId"]
 
-    # todo: validate the item with to a schema
+    # todo: validate the item with a schema
 
     publication_get = db.publications.get_item(
         Key={"id": publication_id},
@@ -47,7 +47,7 @@ def handler(event, context, db):
     item_id = str(uuid.uuid1())
     item["id"] = item_id
     item["publication"] = publication_id
-    item["datePublished"] = str(datetime.date.today())
+    item["datePublished"] = str(datetime.datetime.utcnow())
 
     db.articles.put_item(Item=item)
 
