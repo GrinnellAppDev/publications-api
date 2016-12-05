@@ -1,5 +1,6 @@
-# publications-api
-lambda functions for the publications app
+# Publications Api
+> The backend for the publications app.  Built for [AWS](https://aws.amazon.com/)
+> with [Serverless](https://serverless.com/).
 
 ## Workflow Dependencies
 
