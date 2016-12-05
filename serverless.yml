@@ -44,7 +44,7 @@ provider:
   region: us-west-2
   cfLogs: true # forwards compatibility, see https://serverless.com/framework/docs/providers/aws/guide/functions#log-group-resources
 
-# you can add statements to the Lambda function's IAM Role here
+  # you can add statements to the Lambda function's IAM Role here
   iamRoleStatements:
     - Effect: Allow
       Action: # Gives permission to DynamoDB tables in a specific region
@@ -168,7 +168,6 @@ functions:
   #   events:
   #     - http: DELETE /images/{imageId}
 
-
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -202,6 +201,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
+
     SeriesTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -219,6 +219,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
+
     ArticlesTable:
       Type: AWS::DynamoDB::Table
       Properties:
