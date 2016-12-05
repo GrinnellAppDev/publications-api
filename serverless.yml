@@ -36,6 +36,7 @@ service: publications
 # Check out our docs for more details
 frameworkVersion: "=1.3.0"
 
+
 provider:
   name: aws
   runtime: python2.7
@@ -60,6 +61,7 @@ provider:
 #  environment:
 #    variable1: value1
 
+
 # you can add packaging information here
 package:
 #  include:
@@ -69,22 +71,102 @@ package:
     - .idea/**
     - test-events/**
 
+
 functions:
   publications_list:
     handler: main.publications_list
-    desription: List all publications
+    desription: List all publications.
     events:
       - http: GET /publications
-  articles_get:
-    handler: main.articles_get
-    desription: Get an article through an ID
-    events:
-      - http: GET /publications/{publicationId}/articles/{articleId}
+  # publications_post:
+  #   handler: main.publications_post
+  #   desription: Add a new publication.
+  #   events:
+  #     - http: POST /publications
+  # publications_patch:
+  #   handler: main.publications_patch
+  #   desription: Update an exsisting publication.
+  #   events:
+  #     - http: PATCH /publications/{publicationId}
+  # publications_delete:
+  #   handler: main.publications_delete
+  #   desription: Delete a publication.
+  #   events:
+  #     - http: DELETE /publications/{publicationId}
+
+  # series_list:
+  #   handler: main.series_list
+  #   desription: List all series.
+  #   events:
+  #     - http: GET /publications/{publicationId}/series
+  # series_post:
+  #   handler: main.series_post
+  #   description: Create a new series.
+  #   events:
+  #     - http: POST /publications/{publicationId}/series
+  # series_get:
+  #   handler: main.series_get
+  #   desription: Get an series through an ID.
+  #   events:
+  #     - http: GET /publications/{publicationId}/series/{seriesId}
+  # series_patch:
+  #   handler: main.series_patch
+  #   desription: Update an exsisting series.
+  #   events:
+  #     - http: PATCH /publications/{publicationId}/series/{seriesId}
+  # series_delete:
+  #   handler: main.series_delete
+  #   desription: Delete an series.
+  #   events:
+  #     - http: DELETE /publications/{publicationId}/series/{seriesId}
+
+  # articles_list:
+  #   handler: main.articles_list
+  #   desription: List all articles.
+  #   events:
+  #     - http: GET /publications/{publicationId}/articles
   articles_post:
     handler: main.articles_post
     description: Create a new article.
     events:
       - http: POST /publications/{publicationId}/articles
+  articles_get:
+    handler: main.articles_get
+    desription: Get an article through an ID.
+    events:
+      - http: GET /publications/{publicationId}/articles/{articleId}
+  # articles_patch:
+  #   handler: main.articles_patch
+  #   desription: Update an exsisting article.
+  #   events:
+  #     - http: PATCH /publications/{publicationId}/articles/{articleId}
+  # articles_delete:
+  #   handler: main.articles_delete
+  #   desription: Delete an article.
+  #   events:
+  #     - http: DELETE /publications/{publicationId}/articles/{articleId}
+
+  # images_post:
+  #   handler: main.images_post
+  #   description: Create a new image.
+  #   events:
+  #     - http: POST /images
+  # images_get:
+  #   handler: main.images_get
+  #   desription: Get an image through an ID.
+  #   events:
+  #     - http: GET /images/{imageId}
+  # images_put:
+  #   handler: main.images_put
+  #   desription: Update an exsisting image.
+  #   events:
+  #     - http: PUT /images/{imageId}
+  # images_delete:
+  #   handler: main.images_delete
+  #   desription: Delete a image.
+  #   events:
+  #     - http: DELETE /images/{imageId}
+
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -101,6 +183,7 @@ functions:
 #    Define function environment variables here
 #    environment:
 #      variable2: value2
+
 
 # you can add CloudFormation resource templates here
 resources:
