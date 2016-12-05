@@ -69,6 +69,7 @@ package:
 #    - include-me-dir/**
   exclude:
     - .idea/**
+    - .vscode/**
     - test-events/**
 
 
@@ -188,6 +189,36 @@ functions:
 # you can add CloudFormation resource templates here
 resources:
   Resources:
+    PublicationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: publications_publications
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    SeriesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: publications_series
+        AttributeDefinitions:
+          - AttributeName: publication
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: publication
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
     ArticlesTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -202,19 +233,6 @@ resources:
             KeyType: HASH
           - AttributeName: id
             KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
-    PublicationsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: publications_publications
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
