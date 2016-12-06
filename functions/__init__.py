@@ -1,5 +1,5 @@
 ##
-# main.py
+# functions/__init__.py
 #
 # Copyright (C) 2016  Grinnell AppDev.
 #
