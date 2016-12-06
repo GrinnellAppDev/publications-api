@@ -26,8 +26,8 @@ import sys
 GLOBAL_DIRS = ["shared", "lib"]
 
 # add each of GLOBAL_DIRS to sys.path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.extend([os.path.join(current_dir, gdir) for gdir in GLOBAL_DIRS])
+root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+sys.path.extend([os.path.join(root_dir, gdir) for gdir in GLOBAL_DIRS])
 
 # now that imports are properly configured, we can import our code
 from articles import articles_get, articles_post  # nopep8

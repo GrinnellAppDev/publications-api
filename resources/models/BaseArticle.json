@@ -1,0 +1,9 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Base model for all articles.",
+    "properties": {
+        "author": {
+            "type": "string"
+        }
+    }
+}

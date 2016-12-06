@@ -27,7 +27,7 @@ Replace `FUNCTION_NAME` with the actual name in the correct casing.
 ### Test Functions
 You should edit/create `test-events/FUNCTION_NAME.json` for whatever function
 you want to test. To test a function with that input data, first deploy it, then
-run: `serverless invoke -f FUNCTION_NAME -p test-events/FUNCTION_NAME.json -l`.
+run: `serverless invoke -f FUNCTION_NAME -p test/events/FUNCTION_NAME.json -l`.
 
 Or, use the shortcut: `source invoke-func.sh FUNCTION_NAME`.
 
