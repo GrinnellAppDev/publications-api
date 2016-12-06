@@ -71,7 +71,10 @@ package:
   exclude:
     - .idea/**
     - .vscode/**
-    - test-events/**
+    - test/**
+
+    # don't exclude this until we know we want to use boto3 to fetch our schemas
+    # - resources/**
 
 
 functions:
