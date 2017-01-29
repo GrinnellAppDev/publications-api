@@ -24,6 +24,7 @@ import uuid
 import datetime
 
 from response import create_json_response, HttpError
+from validate import validate_publication_id, InvalidPublicationError
 
 
 def handler(event, context, db):
@@ -35,15 +36,10 @@ def handler(event, context, db):
 
     # todo: validate the item with a schema
 
-    publication_get = db.publications.get_item(
-        Key={"id": publication_id},
-        ProjectionExpression="id"
-    )
-
-    if "Item" not in publication_get:
-        err = Exception
-        raise HttpError(404, "No publication with id: {}"
-                        .format(publication_id))
+    try:
+        validate_publication_id(publication_id, db.publications)
+    except InvalidPublicationError as err:
+        raise HttpError(404, err.message)
 
     item_id = str(uuid.uuid1())
     item["id"] = item_id
