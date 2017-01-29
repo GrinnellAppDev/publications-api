@@ -161,11 +161,27 @@ functions:
   #   description: Create a new image.
   #   events:
   #     - http: POST /images
-  # images_get:
-  #   handler: functions.images_get
-  #   desription: Get an image through an ID.
-  #   events:
-  #     - http: GET /images/{imageId}
+  images_get:
+    handler: functions.images_get
+    description: Get an image through an ID.
+    events:
+      - http:
+          method: GET
+          path: /images/{imageId}
+          integration: lambda
+          request:
+            parameters:
+              paths:
+                imageId: yes
+          response:
+            headers:
+              # Content-Type: "'text/plain'"
+              Content-Type: "'image/jpeg'"
+              # Content-Type: "'application/json'"
+            # template: "$input.path('$.body')"
+            # template: "$util.base64Decode($input.path('$.body'))"
+            # template: ${file(resources/templates/jpeg_response.tmpl)}
+            # contentHandling: CONVERT_TO_BINARY
   # images_put:
   #   handler: functions.images_put
   #   description: Update an exsisting image.

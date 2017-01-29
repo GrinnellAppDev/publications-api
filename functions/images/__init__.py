@@ -1,5 +1,5 @@
 ##
-# functions/__init__.py
+# images/__init__.py
 #
 # Copyright (C) 2016  Grinnell AppDev.
 #
@@ -17,19 +17,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+
 from __future__ import print_function, division
 
-import os
-import sys
+from storage import Bucket, SimpleStorage
+from response import HttpError
+import get
 
-# directories to be exposed so the modules they contain can be imported
-GLOBAL_DIRS = ["shared", "lib"]
 
-# add each of GLOBAL_DIRS to sys.path
-root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
-sys.path.extend([os.path.join(root_dir, gdir) for gdir in GLOBAL_DIRS])
+# bucket = Bucket(Bucket.IMAGES_BUCKET_NAME)
+bucket = SimpleStorage().images
 
-# now that imports are properly configured, we can import our code
-from publications import publications_list  # nopep8
-from articles import articles_get, articles_post  # nopep8
-from images import images_get  # nopep8
+
+def images_get(event, context):
+    try:
+        return get.handler(event, context, bucket)
+    except HttpError as err:
+        return err.to_response()
