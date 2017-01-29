@@ -33,6 +33,10 @@ globals:
   apiModelsUrl:
     https://apigateway.amazonaws.com/restapis/${self:globals.apiId}/models
 
+  bucketIdsByStageName:
+    dev: ""
+  bucketId: ${self:globals.bucketIdsByStageName.${self:globals.stage}}
+
 
 provider:
   name: aws

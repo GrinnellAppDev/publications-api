@@ -21,6 +21,12 @@ PublicationsTable: ${file(resources/tables/PublicationsTable.yml)}
 SeriesTable: ${file(resources/tables/SeriesTable.yml)}
 ArticlesTable: ${file(resources/tables/ArticlesTable.yml)}
 
+ImagesBucket:
+  Type: AWS::S3::Bucket
+  Properties:
+    AccessControl: Private
+    BucketName: publications-images
+
 BaseArticleModel:
   Type: AWS::ApiGateway::Model
   Properties:
