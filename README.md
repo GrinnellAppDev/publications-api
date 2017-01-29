@@ -8,7 +8,7 @@ You will need these setup on your machine to manage your workflow.
 
 - [AWS CLI](https://aws.amazon.com/cli/) (`pip install awscli`)
   - Also needs to be [configured](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html).
-- [Serverless](https://serverless.com/) (`npm intstall -g serverless`)
+- [Serverless](https://serverless.com/) (`npm install -g serverless`)
 
 ## Workflow
 
