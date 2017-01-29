@@ -21,7 +21,7 @@
 #    https://serverless.com/framework/docs/
 
 service: publications
-frameworkVersion: "=1.3.0"
+frameworkVersion: "=1.5.1"
 
 globals:
   stage: ${opts:stage, self:provider.stage}
