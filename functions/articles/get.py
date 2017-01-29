@@ -19,7 +19,7 @@
 
 from __future__ import print_function, division
 
-from response import create_response
+from response import create_json_response, HttpError
 
 
 def handler(event, context, db):
@@ -35,15 +35,14 @@ def handler(event, context, db):
     )
 
     if "Item" not in publication_get:
-        err = Exception("No publication with id: {}".format(publication_id))
-        return create_response(404, err=err)
+        raise HttpError(404, "No publication with id: {}"
+                        .format(publication_id))
 
     articles_get = db.articles.get_item(
         Key={"publication": publication_id, "id": article_id}
     )
 
     if "Item" not in articles_get:
-        err = Exception("No article with id: {}".format(article_id))
-        return create_response(404, err=err)
+        raise HttpError(404, "No article with id: {}".format(article_id))
 
-    return create_response(200, res=articles_get["Item"])
+    return create_json_response(200, body=articles_get["Item"])

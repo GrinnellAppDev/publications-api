@@ -20,17 +20,23 @@
 
 from __future__ import print_function, division
 
-from db import Db
-
+from storage import Db
 import get
 import post
+
 
 db = Db()
 
 
 def articles_get(event, context):
-    return get.handler(event, context, db)
+    try:
+        return get.handler(event, context, db)
+    except HttpError as err:
+        return err.to_response()
 
 
 def articles_post(event, context):
-    return post.handler(event, context, db)
+    try:
+        return post.handler(event, context, db)
+    except HttpError as err:
+        return err.to_response()

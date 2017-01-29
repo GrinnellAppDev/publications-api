@@ -22,22 +22,37 @@ from __future__ import print_function, division
 import json
 
 
-def create_response(status_code, headers={}, res=None, err=None):
-    """
-    Create a response event from status code and content or an error.
-    """
+class HttpError(Exception):
+
+    status_code = None
+
+    def __init__(self, status_code, message):
+        Exception.__init__(self, message)
+        self.status_code = status_code
+
+    def to_response(self):
+        return create_raw_response(
+            status_code=self.status_code,
+            headers={
+                "Content-Type": "text/plain"
+            },
+            body=self.message
+        )
+
+
+def create_json_response(status_code, headers={}, body={}):
     resp_headers = {
         "Content-Type": "application/json",
     }
 
     resp_headers.update(headers)
 
+    return create_raw_response(status_code, resp_headers, json.dumps(body))
+
+
+def create_raw_response(status_code, headers={}, body=""):
     return {
         "statusCode": str(status_code),
-        "body": (
-            err.message if err is not None
-            else json.dumps(res) if res is not None
-            else ""
-        ),
-        "headers": resp_headers
+        "headers": headers,
+        "body": body
     }

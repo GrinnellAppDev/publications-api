@@ -20,12 +20,16 @@
 
 from __future__ import print_function, division
 
-from db import Db
-
+from response import HttpError
+from storage import Db
 import getlist
+
 
 db = Db()
 
 
 def publications_list(event, context):
-    return getlist.handler(event, context, db)
+    try:
+        return getlist.handler(event, context, db)
+    except HttpError as err:
+        return err.to_response()

@@ -23,7 +23,7 @@ import json
 import uuid
 import datetime
 
-from response import create_response
+from response import create_json_response, HttpError
 
 
 def handler(event, context, db):
@@ -41,8 +41,9 @@ def handler(event, context, db):
     )
 
     if "Item" not in publication_get:
-        err = Exception("No publication with id: {}".format(publication_id))
-        return create_response(404, err=err)
+        err = Exception
+        raise HttpError(404, "No publication with id: {}"
+                        .format(publication_id))
 
     item_id = str(uuid.uuid1())
     item["id"] = item_id
@@ -57,4 +58,4 @@ def handler(event, context, db):
         "Location": "{}/{}".format(event["path"], item_id)
     }
 
-    return create_response(201, headers, res=item)
+    return create_json_response(201, headers, body=item)

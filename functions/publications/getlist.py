@@ -19,7 +19,7 @@
 
 from __future__ import print_function, division
 
-from response import create_response
+from response import create_json_response
 
 
 def handler(event, context, db):
@@ -32,4 +32,4 @@ def handler(event, context, db):
     else:
         publications_list = []
 
-    return create_response(200, res=publications_list)
+    return create_json_response(200, body=publications_list)
