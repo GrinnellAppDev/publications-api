@@ -160,11 +160,11 @@ functions:
     description: Update an exsisting article.
     events:
       - http: PATCH /publications/{publicationId}/articles/{articleId}
-  # articles_delete:
-  #   handler: functions.articles_delete
-  #   description: Delete an article.
-  #   events:
-  #     - http: DELETE /publications/{publicationId}/articles/{articleId}
+  articles_delete:
+    handler: functions.articles_delete
+    description: Delete an article.
+    events:
+      - http: DELETE /publications/{publicationId}/articles/{articleId}
 
   # images_post:
   #   handler: functions.images_post

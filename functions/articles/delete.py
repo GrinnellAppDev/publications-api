@@ -1,5 +1,5 @@
 ##
-# functions/__init__.py
+# articles/delete.py
 #
 # Copyright (C) 2016  Grinnell AppDev.
 #
@@ -19,17 +19,25 @@
 
 from __future__ import print_function, division
 
-import os
-import sys
+from response import create_json_response, HttpError
+from validate import validate_publication_id, InvalidArticleError
 
-# directories to be exposed so the modules they contain can be imported
-GLOBAL_DIRS = "shared", "lib"
 
-# add each of GLOBAL_DIRS to sys.path
-root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
-sys.path.extend([os.path.join(root_dir, gdir) for gdir in GLOBAL_DIRS])
+def handler(event, context, db):
+    assert event["httpMethod"] == "DELETE"
 
-# now that imports are properly configured, we can import our code
-from publications import publications_list  # nopep8
-from articles import (articles_get, articles_post, articles_patch,
-                      articles_delete)  # nopep8
+    path_params = event["pathParameters"]
+    publication_id = path_params["publicationId"]
+    article_id = path_params["articleId"]
+
+    validate_publication_id(publication_id, db)
+
+    article_key = {"publication": publication_id, "id": article_id}
+    articles_get = db.articles.get_item(Key=article_key)
+
+    if "Item" not in articles_get:
+        raise InvalidArticleError(article_id)
+
+    db.articles.delete_item(Key=article_key)
+
+    return create_json_response(200, body=articles_get["Item"])
