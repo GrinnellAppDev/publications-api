@@ -26,9 +26,10 @@ interface.
 
 from __future__ import print_function, division
 
+import os
+
 import boto3
 import botocore
-
 from boto3.dynamodb import conditions
 
 
@@ -48,21 +49,21 @@ class Db(object):
     @property
     def publications(self):
         if self._publications_table is None:
-            name = "publications_publications"
+            name = os.environ["PUBLICATIONS_TABLE_NAME"]
             self._publications_table = self._resource.Table(name)
         return self._publications_table
 
     @property
     def series(self):
         if self._series_table is None:
-            name = "publications_series"
+            name = os.environ["SERIES_TABLE_NAME"]
             self._series_table = self._resource.Table(name)
         return self._series_table
 
     @property
     def articles(self):
         if self._articles_table is None:
-            name = "publications_articles"
+            name = os.environ["ARTICLES_TABLE_NAME"]
             self._articles_table = self._resource.Table(name)
         return self._articles_table
 
@@ -78,7 +79,7 @@ class SimpleStorage(object):
     @property
     def images(self):
         if self._images_bucket is None:
-            name = "publications-images"
+            name = os.environ["IMAGES_BUCKET_NAME"]
             self._images_bucket = self._resource.Bucket(name)
         return self._images_bucket
 
@@ -87,7 +88,7 @@ class Bucket(object):
 
     ClientError = botocore.exceptions.ClientError
 
-    IMAGES_BUCKET_NAME = "publications-images"
+    IMAGES_BUCKET_NAME = os.environ["IMAGES_BUCKET_NAME"]
 
     _client = None
     _bucket_name = None

@@ -19,7 +19,7 @@
 
 Type: AWS::DynamoDB::Table
 Properties:
-  TableName: publications_publications
+  TableName: ${file(serverless.yml):custom.resourceNames.publicationsTable}
   AttributeDefinitions:
     - AttributeName: id
       AttributeType: S

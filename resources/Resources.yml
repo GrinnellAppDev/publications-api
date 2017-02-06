@@ -25,7 +25,7 @@ ImagesBucket:
   Type: AWS::S3::Bucket
   Properties:
     AccessControl: Private
-    BucketName: publications-images
+    BucketName: ${file(serverless.yml):custom.resourceNames.imagesBucket}
 
 BaseArticleModel:
   Type: AWS::ApiGateway::Model

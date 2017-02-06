@@ -23,19 +23,25 @@
 service: publications
 frameworkVersion: "=1.5.1"
 
-globals:
-  stage: ${opts:stage, self:provider.stage}
-  region: ${opts:region, self:provider.region}
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
 
-  apiIdsByStageName:
-    dev: 14dvrdkbu2
-  apiId: ${self:globals.apiIdsByStageName.${self:globals.stage}}
-  apiModelsUrl:
-    https://apigateway.amazonaws.com/restapis/${self:globals.apiId}/models
+  # apiIdsByStageName:
+  #   dev: 14dvrdkbu2
+  # apiId: ${self:custom.apiIdsByStageName.${self:custom.stage}}
+  # apiModelsUrl:
+  #   https://apigateway.amazonaws.com/restapis/${self:custom.apiId}/models
 
   bucketIdsByStageName:
     dev: ""
-  bucketId: ${self:globals.bucketIdsByStageName.${self:globals.stage}}
+  bucketId: ${self:custom.bucketIdsByStageName.${self:custom.stage}}
+
+  resourceNames:
+    imagesBucket: ${self:service}-${self:custom.stage}-images
+    articlesTable: ${self:service}-${self:custom.stage}-articles
+    publicationsTable: ${self:service}-${self:custom.stage}-publications
+    seriesTable: ${self:service}-${self:custom.stage}-series
 
 
 provider:
@@ -48,9 +54,13 @@ provider:
   # https://serverless.com/framework/docs/providers/aws/guide/functions#log-group-resources
   cfLogs: true
 
-  # environment:
-  #   API_ID: ${self:globals.apiId}
-  #   BUCKET_ID: ${self:globals.bucketId}
+  environment:
+    IMAGES_BUCKET_NAME: ${self:custom.resourceNames.imagesBucket}
+    ARTICLES_TABLE_NAME: ${self:custom.resourceNames.articlesTable}
+    PUBLICATIONS_TABLE_NAME: ${self:custom.resourceNames.publicationsTable}
+    SERIES_TABLE_NAME: ${self:custom.resourceNames.seriesTable}
+  #   API_ID: ${self:custom.apiId}
+  #   BUCKET_ID: ${self:custom.bucketId}
 
   # you can add statements to the Lambda function's IAM Role here
   # see http://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html
