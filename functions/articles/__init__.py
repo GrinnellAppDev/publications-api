@@ -21,6 +21,8 @@
 from __future__ import print_function, division
 
 from storage import Db
+from response import HttpError
+
 import get
 import post
 

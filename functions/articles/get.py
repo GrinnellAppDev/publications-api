@@ -20,7 +20,7 @@
 from __future__ import print_function, division
 
 from response import create_json_response, HttpError
-from validate import validate_publication_id, InvalidPublicationError
+from validate import validate_publication_id, InvalidArticleError
 
 
 def handler(event, context, db):
@@ -30,16 +30,13 @@ def handler(event, context, db):
     publication_id = path_params["publicationId"]
     article_id = path_params["articleId"]
 
-    try:
-        validate_publication_id(publication_id, db.publications)
-    except InvalidPublicationError as err:
-        raise HttpError(404, err.message)
+    validate_publication_id(publication_id, db)
 
     articles_get = db.articles.get_item(
         Key={"publication": publication_id, "id": article_id}
     )
 
     if "Item" not in articles_get:
-        raise HttpError(404, "No article with id: {}".format(article_id))
+        raise InvalidArticleError(article_id)
 
     return create_json_response(200, body=articles_get["Item"])

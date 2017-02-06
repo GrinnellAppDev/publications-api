@@ -24,16 +24,25 @@ Validate requests with json schema.
 from jsonschema import validate
 import boto3
 
+from response import HttpError
 
-class InvalidPublicationError(Exception):
+
+class InvalidPublicationError(HttpError):
     def __init__(self, publication_id):
-        super(InvalidPublicationError, self).__init__(
-            "No publication with id: {}".format(publication_id)
+        HttpError.__init__(
+            self, 404, "No publication with id: {}".format(publication_id)
         )
 
 
-def validate_publication_id(pub_id, table):
-    get = table.get_item(
+class InvalidArticleError(HttpError):
+    def __init__(self, article_id):
+        HttpError.__init__(
+            self, 404, "No article with id: {}".format(article_id)
+        )
+
+
+def validate_publication_id(pub_id, db):
+    get = db.publications.get_item(
         Key={"id": pub_id},
         ProjectionExpression="id"
     )

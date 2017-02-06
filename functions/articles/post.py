@@ -24,34 +24,31 @@ import uuid
 import datetime
 
 from response import create_json_response, HttpError
-from validate import validate_publication_id, InvalidPublicationError
+from validate import validate_publication_id
 
 
 def handler(event, context, db):
     assert event["httpMethod"] == "POST"
 
-    item = json.loads(event["body"])
+    article = json.loads(event["body"])
     path_params = event["pathParameters"]
     publication_id = path_params["publicationId"]
 
-    # todo: validate the item with a schema
+    # todo: validate the article with a schema
 
-    try:
-        validate_publication_id(publication_id, db.publications)
-    except InvalidPublicationError as err:
-        raise HttpError(404, err.message)
+    validate_publication_id(publication_id, db)
 
-    item_id = str(uuid.uuid1())
-    item["id"] = item_id
-    item["publication"] = publication_id
-    item["datePublished"] = str(datetime.datetime.utcnow())
+    article_id = str(uuid.uuid1())
+    article["id"] = article_id
+    article["publication"] = publication_id
+    article["datePublished"] = str(datetime.datetime.utcnow())
 
-    db.articles.put_item(Item=item)
+    db.articles.put_item(Item=article)
 
     assert event["path"][-1] != "/"
 
     headers = {
-        "Location": "{}/{}".format(event["path"], item_id)
+        "Location": "{}/{}".format(event["path"], article_id)
     }
 
-    return create_json_response(201, headers, body=item)
+    return create_json_response(201, headers, body=article)
