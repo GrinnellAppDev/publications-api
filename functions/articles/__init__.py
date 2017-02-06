@@ -25,6 +25,7 @@ from response import HttpError
 
 import get
 import post
+import patch
 
 
 db = Db()
@@ -40,5 +41,12 @@ def articles_get(event, context):
 def articles_post(event, context):
     try:
         return post.handler(event, context, db)
+    except HttpError as err:
+        return err.to_response()
+
+
+def articles_patch(event, context):
+    try:
+        return patch.handler(event, context, db)
     except HttpError as err:
         return err.to_response()

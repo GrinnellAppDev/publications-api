@@ -155,11 +155,11 @@ functions:
     description: Get an article through an ID.
     events:
       - http: GET /publications/{publicationId}/articles/{articleId}
-  # articles_patch:
-  #   handler: functions.articles_patch
-  #   description: Update an exsisting article.
-  #   events:
-  #     - http: PATCH /publications/{publicationId}/articles/{articleId}
+  articles_patch:
+    handler: functions.articles_patch
+    description: Update an exsisting article.
+    events:
+      - http: PATCH /publications/{publicationId}/articles/{articleId}
   # articles_delete:
   #   handler: functions.articles_delete
   #   description: Delete an article.

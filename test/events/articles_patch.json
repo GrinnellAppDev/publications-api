@@ -1,5 +1,5 @@
 {
-    "body": "{\"title\": \"Wilson cutting Appdev funding\",\"content\": \"Appdev has recently come under fire!\",\"issue\": \"ae2f3b54-a49f-11e6-b1ab-a0999b05c023\",\"tags\": [\"SHACS\", \"health\", \"funding\"],\"url\" :\"http://www.thesandb.com/news/shacs-to-offer-funds-for-students-in-need.html\",\"author\": \"Solomon Grundy\",\"brief\" : \"Following a recent \\\"State of SHACS\\\" presentation, some students were displeased.\", \"series\": \"ada28c7d-a49f-11e6-b9d3-a0999b05c023\"}",
+    "body": "{\"content\": \"BREAKING NEWS: Appdev has recently come under fire!  It's quite a schemozzle!\"}",
     "resource": "/{proxy+}",
     "requestContext": {
         "resourceId": "123456",
@@ -47,11 +47,12 @@
         "Accept-Encoding": "gzip, deflate, sdch"
     },
     "pathParameters": {
-        "publicationId": "8e031545-ba66-11e6-8193-a0999b05c023"
+        "publicationId": "8e031545-ba66-11e6-8193-a0999b05c023",
+        "articleId": "db7bc676-ba7d-11e6-8de8-a20f19d048b3"
     },
-    "httpMethod": "POST",
+    "httpMethod": "PATCH",
     "stageVariables": {
         "baz": "qux"
     },
-    "path": "/publications/8e031545-ba66-11e6-8193-a0999b05c023/articles"
+    "path": "/path/to/resource"
 }

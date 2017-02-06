@@ -31,4 +31,4 @@ sys.path.extend([os.path.join(root_dir, gdir) for gdir in GLOBAL_DIRS])
 
 # now that imports are properly configured, we can import our code
 from publications import publications_list  # nopep8
-from articles import articles_get, articles_post  # nopep8
+from articles import articles_get, articles_post, articles_patch  # nopep8
