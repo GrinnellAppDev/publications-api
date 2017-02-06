@@ -1,5 +1,5 @@
 ##
-# articles/post.py
+# articles/patch.py
 #
 # Copyright (C) 2016  Grinnell AppDev.
 #
