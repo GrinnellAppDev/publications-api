@@ -53,4 +53,4 @@ def handler(event, context, db):
 
     assert event["path"][-1] != "/"
 
-    return create_json_response(201, body=article)
+    return create_json_response(200, body=article)
