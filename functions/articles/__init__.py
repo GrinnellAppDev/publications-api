@@ -23,6 +23,7 @@ from __future__ import print_function, division
 from storage import Db
 from response import HttpError
 
+import getlist
 import get
 import post
 import patch
@@ -30,6 +31,13 @@ import delete
 
 
 db = Db()
+
+
+def articles_list(event, context):
+    try:
+        return getlist.handler(event, context, db)
+    except HttpError as err:
+        return err.to_response()
 
 
 def articles_get(event, context):

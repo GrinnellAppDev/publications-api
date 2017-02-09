@@ -1,5 +1,5 @@
 ##
-# functions/__init__.py
+# articles/getlist.py
 #
 # Copyright (C) 2016  Grinnell AppDev.
 #
@@ -19,17 +19,18 @@
 
 from __future__ import print_function, division
 
-import os
-import sys
+from response import create_json_response
 
-# directories to be exposed so the modules they contain can be imported
-GLOBAL_DIRS = "shared", "lib"
 
-# add each of GLOBAL_DIRS to sys.path
-root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
-sys.path.extend([os.path.join(root_dir, gdir) for gdir in GLOBAL_DIRS])
+def handler(event, context, db):
+    assert event["httpMethod"] == "GET"
 
-# now that imports are properly configured, we can import our code
-from publications import publications_list  # nopep8
-from articles import (articles_list, articles_get, articles_post,
-                      articles_patch, articles_delete)  # nopep8
+    articles_get = db.articles.scan()  # warning naieve hack, doesn't work for
+                                       # multiple publications
+
+    if "Items" in articles_get:
+        articles_list = articles_get["Items"]
+    else:
+        articles_list = []
+
+    return create_json_response(200, body=articles_list)

@@ -143,11 +143,14 @@ functions:
   #   events:
   #     - http: DELETE /publications/{publicationId}/series/{seriesId}
 
-  # articles_list:
-  #   handler: functions.articles_list
-  #   description: List all articles.
-  #   events:
-  #     - http: GET /publications/{publicationId}/articles
+  articles_list:
+    handler: functions.articles_list
+    description: List all articles.
+    events:
+      - http:
+          method: GET
+          path: /publications/{publicationId}/articles
+          cors: true
   articles_post:
     handler: functions.articles_post
     description: Create a new article.
