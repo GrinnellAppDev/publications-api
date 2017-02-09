@@ -97,7 +97,10 @@ functions:
     handler: functions.publications_list
     description: List all publications.
     events:
-      - http: GET /publications
+      - http:
+          method: GET
+          path: /publications
+          cors: true
   # publications_post:
   #   handler: functions.publications_post
   #   description: Add a new publication.
@@ -149,22 +152,34 @@ functions:
     handler: functions.articles_post
     description: Create a new article.
     events:
-      - http: POST /publications/{publicationId}/articles
+      - http:
+          method: POST
+          path: /publications/{publicationId}/articles
+          cors: true
   articles_get:
     handler: functions.articles_get
     description: Get an article through an ID.
     events:
-      - http: GET /publications/{publicationId}/articles/{articleId}
+      - http:
+          method: GET
+          path: /publications/{publicationId}/articles/{articleId}
+          cors: true
   articles_patch:
     handler: functions.articles_patch
     description: Update an exsisting article.
     events:
-      - http: PATCH /publications/{publicationId}/articles/{articleId}
+      - http:
+          method: PATCH
+          path: /publications/{publicationId}/articles/{articleId}
+          cors: true
   articles_delete:
     handler: functions.articles_delete
     description: Delete an article.
     events:
-      - http: DELETE /publications/{publicationId}/articles/{articleId}
+      - http:
+          method: DELETE
+          path: /publications/{publicationId}/articles/{articleId}
+          cors: true
 
   # images_post:
   #   handler: functions.images_post

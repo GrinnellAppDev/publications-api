@@ -34,7 +34,8 @@ class HttpError(Exception):
         return create_raw_response(
             status_code=self.status_code,
             headers={
-                "Content-Type": "text/plain"
+                "Content-Type": "text/plain",
+                "Access-Control-Allow-Origin": "*",
             },
             body=self.message
         )
@@ -43,6 +44,9 @@ class HttpError(Exception):
 def create_json_response(status_code, headers={}, body={}):
     resp_headers = {
         "Content-Type": "application/json",
+
+        # todo: maybe get more exclusive
+        "Access-Control-Allow-Origin": "*",
     }
 
     resp_headers.update(headers)
