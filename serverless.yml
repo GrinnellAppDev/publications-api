@@ -21,17 +21,28 @@
 #    https://serverless.com/framework/docs/
 
 service: publications
-frameworkVersion: "=1.5.1"
+frameworkVersion: "=1.6.1"
+
+plugins:
+  - serverless-aws-models
 
 custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
 
-  # apiIdsByStageName:
-  #   dev: 14dvrdkbu2
-  # apiId: ${self:custom.apiIdsByStageName.${self:custom.stage}}
-  # apiModelsUrl:
-  #   https://apigateway.amazonaws.com/restapis/${self:custom.apiId}/models
+  models:
+    ArticleBriefList:
+      ContentType: application/json
+      Schema: ${file(resources/models/ArticleBriefList.js):schema}
+    ArticleEdit:
+      ContentType: application/json
+      Schema: ${file(resources/models/ArticleEdit.js):schema}
+    Article:
+      ContentType: application/json
+      Schema: ${file(resources/models/Article.js):schema}
+    PublicationList:
+      ContentType: application/json
+      Schema: ${file(resources/models/PublicationList.js):schema}
 
   bucketIdsByStageName:
     dev: ""
@@ -101,6 +112,10 @@ functions:
           method: GET
           path: /publications
           cors: true
+          methodResponses:
+            - StatusCode: 200
+              ResponseModels:
+                application/json: PublicationList
   # publications_post:
   #   handler: functions.publications_post
   #   description: Add a new publication.
@@ -151,6 +166,10 @@ functions:
           method: GET
           path: /publications/{publicationId}/articles
           cors: true
+          methodResponses:
+            - StatusCode: 200
+              ResponseModels:
+                application/json: ArticleBriefList
   articles_post:
     handler: functions.articles_post
     description: Create a new article.
@@ -159,6 +178,8 @@ functions:
           method: POST
           path: /publications/{publicationId}/articles
           cors: true
+          requestModels:
+            application/json: ArticleEdit
   articles_get:
     handler: functions.articles_get
     description: Get an article through an ID.
@@ -167,6 +188,10 @@ functions:
           method: GET
           path: /publications/{publicationId}/articles/{articleId}
           cors: true
+          methodResponses:
+            - StatusCode: 200
+              ResponseModels:
+                application/json: Article
   articles_patch:
     handler: functions.articles_patch
     description: Update an exsisting article.
@@ -175,6 +200,8 @@ functions:
           method: PATCH
           path: /publications/{publicationId}/articles/{articleId}
           cors: true
+          requestModels:
+            application/json: ArticleEdit
   articles_delete:
     handler: functions.articles_delete
     description: Delete an article.

@@ -26,13 +26,3 @@ ImagesBucket:
   Properties:
     AccessControl: Private
     BucketName: ${file(serverless.yml):custom.resourceNames.imagesBucket}
-
-BaseArticleModel:
-  Type: AWS::ApiGateway::Model
-  Properties:
-    RestApiId:
-      Ref: ApiGatewayRestApi
-    ContentType: application/json
-    Description: ${file(resources/models/BaseArticle.json):description}
-    Name: BaseArticleModel
-    Schema: ${file(resources/models/BaseArticle.json)}
