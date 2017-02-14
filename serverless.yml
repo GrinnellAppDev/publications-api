@@ -206,6 +206,10 @@ functions:
           method: DELETE
           path: /publications/{publicationId}/articles/{articleId}
           cors: true
+          methodResponses:
+            - StatusCode: 200
+              ResponseModels:
+                application/json: Article
 
   # images_post:
   #   handler: functions.images_post
