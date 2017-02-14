@@ -44,10 +44,6 @@ custom:
       ContentType: application/json
       Schema: ${file(resources/models/PublicationList.js):schema}
 
-  bucketIdsByStageName:
-    dev: ""
-  bucketId: ${self:custom.bucketIdsByStageName.${self:custom.stage}}
-
   resourceNames:
     imagesBucket: ${self:service}-${self:custom.stage}-images
     articlesTable: ${self:service}-${self:custom.stage}-articles
