@@ -24,25 +24,35 @@ service: publications
 frameworkVersion: "=1.6.1"
 
 plugins:
-  - serverless-aws-models
+  - serverless-aws-documentation
 
 custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
 
-  models:
-    ArticleBriefList:
-      ContentType: application/json
-      Schema: ${file(resources/models/ArticleBriefList.js):schema}
-    ArticleEdit:
-      ContentType: application/json
-      Schema: ${file(resources/models/ArticleEdit.js):schema}
-    Article:
-      ContentType: application/json
-      Schema: ${file(resources/models/Article.js):schema}
-    PublicationList:
-      ContentType: application/json
-      Schema: ${file(resources/models/PublicationList.js):schema}
+  documentation:
+    summary: Publications API
+    description: Access and manage publications and articles.
+    resources:
+      - path: /publications
+        description: List publications.
+    models:
+      - name: ArticleBriefList
+        contentType: application/json
+        description: ${file(resources/models/ArticleBriefList.js):schema.description}
+        schema: ${file(resources/models/ArticleBriefList.js):schema}
+      - name: ArticleEdit
+        contentType: application/json
+        description: ${file(resources/models/ArticleEdit.js):schema.description}
+        schema: ${file(resources/models/ArticleEdit.js):schema}
+      - name: Article
+        contentType: application/json
+        description: ${file(resources/models/Article.js):schema.description}
+        schema: ${file(resources/models/Article.js):schema}
+      - name: PublicationList
+        contentType: application/json
+        description: ${file(resources/models/PublicationList.js):schema.description}
+        schema: ${file(resources/models/PublicationList.js):schema}
 
   resourceNames:
     imagesBucket: ${self:service}-${self:custom.stage}-images
@@ -102,16 +112,17 @@ package:
 functions:
   publications_list:
     handler: functions.publications_list
-    description: List all publications.
     events:
       - http:
           method: GET
           path: /publications
           cors: true
-          methodResponses:
-            - StatusCode: 200
-              ResponseModels:
-                application/json: PublicationList
+          documentation:
+            description: List all publications.
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: PublicationList
   # publications_post:
   #   handler: functions.publications_post
   #   description: Add a new publication.
@@ -156,60 +167,65 @@ functions:
 
   articles_list:
     handler: functions.articles_list
-    description: List all articles.
     events:
       - http:
           method: GET
           path: /publications/{publicationId}/articles
           cors: true
-          methodResponses:
-            - StatusCode: 200
-              ResponseModels:
-                application/json: ArticleBriefList
+          documentation:
+            description: List all articles.
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: ArticleBriefList
   articles_post:
     handler: functions.articles_post
-    description: Create a new article.
     events:
       - http:
           method: POST
           path: /publications/{publicationId}/articles
           cors: true
-          requestModels:
-            application/json: ArticleEdit
+          documentation:
+            description: Create a new article.
+            requestModels:
+              application/json: ArticleEdit
   articles_get:
     handler: functions.articles_get
-    description: Get an article through an ID.
     events:
       - http:
           method: GET
           path: /publications/{publicationId}/articles/{articleId}
           cors: true
-          methodResponses:
-            - StatusCode: 200
-              ResponseModels:
-                application/json: Article
+          documentation:
+            description: Get an article through an ID.
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: Article
   articles_patch:
     handler: functions.articles_patch
-    description: Update an exsisting article.
     events:
       - http:
           method: PATCH
           path: /publications/{publicationId}/articles/{articleId}
           cors: true
-          requestModels:
-            application/json: ArticleEdit
+          documentation:
+            description: Update an exsisting article.
+            requestModels:
+              application/json: ArticleEdit
   articles_delete:
     handler: functions.articles_delete
-    description: Delete an article.
     events:
       - http:
           method: DELETE
           path: /publications/{publicationId}/articles/{articleId}
           cors: true
-          methodResponses:
-            - StatusCode: 200
-              ResponseModels:
-                application/json: Article
+          documentation:
+            description: Delete an article.
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: Article
 
   # images_post:
   #   handler: functions.images_post

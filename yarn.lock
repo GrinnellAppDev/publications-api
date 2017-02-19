@@ -58,7 +58,7 @@ async@^2.0.0:
   dependencies:
     lodash "^4.14.0"
 
-aws-sdk@^2.7.13:
+aws-sdk@^2.7.12, aws-sdk@^2.7.13:
   version "2.12.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.12.0.tgz#f9ae9f11d458764604ccb4a80e34e3c07a6d7d1b"
   dependencies:
@@ -754,9 +754,11 @@ semver@~5.0.1:
   version "5.0.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.0.3.tgz#77466de589cd5d3c95f138aa78bc569a3cb5d27a"
 
-serverless-aws-models@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/serverless-aws-models/-/serverless-aws-models-1.0.1.tgz#438840bb4056738dfbb1aa9401efdcd3951c7be9"
+serverless-aws-documentation@^0.5.7:
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/serverless-aws-documentation/-/serverless-aws-documentation-0.5.7.tgz#40ccf80ad2beb7aafc28a0f63b8feed6f5543784"
+  dependencies:
+    aws-sdk "^2.7.12"
 
 serverless@^1.6.1:
   version "1.6.1"
