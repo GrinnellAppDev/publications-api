@@ -33,11 +33,11 @@ def deep_empty_string_clean(obj):
             if obj[key] == "":
                 del obj[key]
             else:
-                deep_sanitize(obj[key])
+                deep_empty_string_clean(obj[key])
     elif type(obj) == list:
         obj[:] = [item for item in obj if item != ""]
         for item in obj:
-            deep_sanitize(item)
+            deep_empty_string_clean(item)
 
 
 class InvalidPublicationError(HttpError):
