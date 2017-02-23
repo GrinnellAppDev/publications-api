@@ -24,7 +24,8 @@ import uuid
 import datetime
 
 from response import create_json_response, HttpError
-from validate import validate_publication_id, InvalidArticleError
+from validate import (validate_publication_id, deep_empty_string_clean,
+                      InvalidArticleError)
 
 
 def handler(event, context, db):
@@ -38,6 +39,8 @@ def handler(event, context, db):
     # todo: validate the updates with a schema, make some fields immutable
 
     validate_publication_id(publication_id, db)
+
+    deep_empty_string_clean(new_fields)
 
     articles_get = db.articles.get_item(
         Key={"publication": publication_id, "id": article_id}
