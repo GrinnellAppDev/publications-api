@@ -189,6 +189,10 @@ functions:
             description: Create a new article.
             requestModels:
               application/json: ArticleEdit
+            methodResponses:
+              - statusCode: 201
+                responseModels:
+                  application/json: Article
   articles_get:
     handler: functions.articles_get
     events:
@@ -213,6 +217,10 @@ functions:
             description: Update an exsisting article.
             requestModels:
               application/json: ArticleEdit
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: Article
   articles_delete:
     handler: functions.articles_delete
     events:
