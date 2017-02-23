@@ -1,5 +1,5 @@
 {
-    "body": "{\"content\": \"BREAKING NEWS: Appdev has recently come under fire!  It's quite a schemozzle!\"}",
+    "body": "{\"content\": \"BREAKING NEWS: Appdev has recently come under fire!  It's quite a schemozzle!\", \"brief\": \"\"}",
     "resource": "/{proxy+}",
     "requestContext": {
         "resourceId": "123456",

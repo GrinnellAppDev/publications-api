@@ -1,28 +1,6 @@
 {
-    "body": "{\"title\": \"Wilson cutting Appdev funding\",\"content\": \"Appdev has recently come under fire!\",\"issue\": \"ae2f3b54-a49f-11e6-b1ab-a0999b05c023\",\"tags\": [\"SHACS\", \"health\", \"funding\"],\"url\" :\"http://www.thesandb.com/news/shacs-to-offer-funds-for-students-in-need.html\",\"author\": \"Solomon Grundy\",\"brief\" : \"Following a recent \\\"State of SHACS\\\" presentation, some students were displeased.\", \"series\": \"ada28c7d-a49f-11e6-b9d3-a0999b05c023\"}",
+    "body": "{\"title\": \"Wilson cutting Appdev funding\",\"content\": \"Appdev has recently come under fire!\",\"authors\": [{\"name\":\"Solomon Grundy\", \"email\": \"grundyso@grinnell.edu\"}, {\"name\": \"\", \"email\": \"\"}], \"tags\": [\"\"], \"brief\" : \"Following a recent \\\"State of SHACS\\\" presentation, some students were displeased.\", \"headerImage\": \"\"}",
     "resource": "/{proxy+}",
-    "requestContext": {
-        "resourceId": "123456",
-        "apiId": "1234567890",
-        "resourcePath": "/{proxy+}",
-        "httpMethod": "POST",
-        "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
-        "accountId": "123456789012",
-        "identity": {
-            "apiKey": null,
-            "userArn": null,
-            "cognitoAuthenticationType": null,
-            "caller": null,
-            "userAgent": "Custom User Agent String",
-            "user": null,
-            "cognitoIdentityPoolId": null,
-            "cognitoIdentityId": null,
-            "cognitoAuthenticationProvider": null,
-            "sourceIp": "127.0.0.1",
-            "accountId": null
-        },
-        "stage": "prod"
-    },
     "queryStringParameters": {
         "foo": "bar"
     },
@@ -50,8 +28,5 @@
         "publicationId": "8e031545-ba66-11e6-8193-a0999b05c023"
     },
     "httpMethod": "POST",
-    "stageVariables": {
-        "baz": "qux"
-    },
     "path": "/publications/8e031545-ba66-11e6-8193-a0999b05c023/articles"
 }

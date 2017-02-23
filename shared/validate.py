@@ -27,6 +27,19 @@ import boto3
 from response import HttpError
 
 
+def deep_empty_string_clean(obj):
+    if type(obj) == dict:
+        for key in obj.keys():
+            if obj[key] == "":
+                del obj[key]
+            else:
+                deep_sanitize(obj[key])
+    elif type(obj) == list:
+        obj[:] = [item for item in obj if item != ""]
+        for item in obj:
+            deep_sanitize(item)
+
+
 class InvalidPublicationError(HttpError):
     def __init__(self, publication_id):
         HttpError.__init__(
