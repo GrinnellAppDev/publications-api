@@ -9,7 +9,7 @@
     "deploy": "SLS_DEBUG=* serverless deploy -s",
     "sls": "serverless",
     "func": "bash -c 'serverless deploy function -f $1 -s $2 && serverless invoke -f $1 -s $2 -p \"test/events/$1.json\" -l' 0",
-    "swagger": "bash -c 'mkdir -p .tmp && aws apigateway get-export --export-type swagger --rest-api-id $(node helpers.js api-id $1-publications) --stage-name $1 .tmp/swagger.json && aws s3 cp .tmp/swagger.json s3://publications-docs/stages/$1.json --region \"us-east-2\"' 0"
+    "swagger": "bash -c 'mkdir -p .tmp && aws apigateway get-export --export-type swagger --rest-api-id $(node helpers.js api-id $1-publications) --stage-name $1 .tmp/swagger.json && aws s3 cp .tmp/swagger.json s3://publications-docs/stages/$1.json --region \"us-east-2\" && echo \"\nDocs available at: http://publications-docs.s3-website.us-east-2.amazonaws.com/?stage=$1\n\"' 0"
   },
   "devDependencies": {
     "serverless": "^1.6.1",
