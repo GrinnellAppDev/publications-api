@@ -41,6 +41,10 @@ custom:
         contentType: application/json
         description: ${file(resources/models/ShortArticleList.js):schema.description}
         schema: ${file(resources/models/ShortArticleList.js):schema}
+      - name: ArticleCreate
+        contentType: application/json
+        description: ${file(resources/models/ArticleCreate.js):schema.description}
+        schema: ${file(resources/models/ArticleCreate.js):schema}
       - name: ArticleEdit
         contentType: application/json
         description: ${file(resources/models/ArticleEdit.js):schema.description}
@@ -188,7 +192,7 @@ functions:
           documentation:
             description: Create a new article.
             requestModels:
-              application/json: ArticleEdit
+              application/json: ArticleCreate
             methodResponses:
               - statusCode: 201
                 responseModels:
