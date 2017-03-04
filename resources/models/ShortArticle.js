@@ -1,9 +1,9 @@
 module.exports.schema = () => ({
     $schema: "http://json-schema.org/draft-04/schema#",
-    title: "ArticleBrief",
+    title: "ShortArticle",
     description: "Shortened article with only the information needed to show " +
                  "it in a listview",
-    required: ["id", "publication", "datePublished", "title"],
+    required: ["id", "publication", "datePublished", "title", "authors"],
     additionalProperties: false,
     properties: {
         id: Object.assign(require("./UUID").schema(), {
@@ -22,10 +22,10 @@ module.exports.schema = () => ({
             type: "string",
             description: "The headline of the article",
         },
-        brief: {
-            type: "string",
-            description: "A short description of the article",
-            maxLength: 140,
+        authors: {
+            type: "array",
+            description: "A list of all collaborators on the article",
+            items: require("./Author").schema(),
         },
     },
 });

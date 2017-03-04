@@ -1,6 +1,6 @@
 module.exports.schema = () => ({
     $schema: "http://json-schema.org/draft-04/schema#",
-    title: "ArticleBriefList",
+    title: "ShortArticleList",
     description: "A list of article briefs",
     type: "object",
     required: ["items"],
@@ -8,7 +8,7 @@ module.exports.schema = () => ({
     properties: {
         items: {
             type: "array",
-            items: require("./ArticleBrief").schema(),
+            items: require("./ShortArticle").schema(),
         },
     },
 });

@@ -11,11 +11,6 @@ module.exports.schema = () => ({
             type: "string",
             description: "The headline of the article",
         },
-        brief: {
-            type: "string",
-            description: "A short description of the article",
-            maxLength: 140,
-        },
         content: {
             type: "string",
             description: "The full text of the article formatted with markdown",

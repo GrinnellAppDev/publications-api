@@ -37,10 +37,10 @@ custom:
       - path: /publications
         description: List publications.
     models:
-      - name: ArticleBriefList
+      - name: ShortArticleList
         contentType: application/json
-        description: ${file(resources/models/ArticleBriefList.js):schema.description}
-        schema: ${file(resources/models/ArticleBriefList.js):schema}
+        description: ${file(resources/models/ShortArticleList.js):schema.description}
+        schema: ${file(resources/models/ShortArticleList.js):schema}
       - name: ArticleEdit
         contentType: application/json
         description: ${file(resources/models/ArticleEdit.js):schema.description}
@@ -177,7 +177,7 @@ functions:
             methodResponses:
               - statusCode: 200
                 responseModels:
-                  application/json: ArticleBriefList
+                  application/json: ShortArticleList
   articles_post:
     handler: functions.articles_post
     events:
