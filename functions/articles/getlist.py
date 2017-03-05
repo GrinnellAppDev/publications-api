@@ -31,14 +31,14 @@ def handler(event, context, db):
 
     query_params = event["queryStringParameters"]
 
-    try:
+    if query_params is not None and "pageToken" in query_params:
         page_token = query_params["pageToken"]
-    except KeyError:
+    else:
         page_token = None
 
-    try:
-        page_size = query_params["pageSize"]
-    except KeyError:
+    if query_params is not None and "pageSize" in query_params:
+        page_size = int(query_params["pageSize"])
+    else:
         page_size = 20
 
     validate_publication_id(publication_id, db)
