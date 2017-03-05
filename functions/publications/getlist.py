@@ -25,7 +25,19 @@ from response import create_json_response
 def handler(event, context, db):
     assert event["httpMethod"] == "GET"
 
-    publications, next_page_token = db.publications.scan()
+    query_params = event["queryStringParameters"]
+
+    try:
+        page_token = query_params["pageToken"]
+    except KeyError:
+        page_token = None
+
+    try:
+        page_size = query_params["pageSize"]
+    except KeyError:
+        page_size = 20
+
+    publications, next_page_token = db.publications.scan(page_token, page_size)
 
     response = {
         "items": publications,

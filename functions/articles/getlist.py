@@ -29,9 +29,22 @@ def handler(event, context, db):
     path_params = event["pathParameters"]
     publication_id = path_params["publicationId"]
 
+    query_params = event["queryStringParameters"]
+
+    try:
+        page_token = query_params["pageToken"]
+    except KeyError:
+        page_token = None
+
+    try:
+        page_size = query_params["pageSize"]
+    except KeyError:
+        page_size = 20
+
     validate_publication_id(publication_id, db)
 
     articles, next_page_token = db.articles.query(
+        page_token, page_size,
         db.Key("publication").eq(publication_id),
         index=db.SHORT_ARTICLES_BY_DATE_INDEX
     )

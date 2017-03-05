@@ -27,6 +27,8 @@ interface.
 from __future__ import print_function, division
 
 import os
+import json
+import base64
 
 from lru import lru_cache
 import boto3
@@ -81,6 +83,28 @@ def _from_attribute_dict(attrs):
     return _from_attribute({"M": attrs})
 
 
+def _encode_token(obj):
+    return base64.b64encode(json.dumps(obj))
+
+
+def _decode_token(token):
+    return json.loads(base64.b64decode(token))
+
+
+def _paginated_response(response):
+    try:
+        items = [_from_attribute_dict(item) for item in response["Items"]]
+    except KeyError:
+        items = []
+
+    try:
+        next_page_token = _encode_token(response["LastEvaluatedKey"])
+    except KeyError:
+        next_page_token = None
+
+    return items, next_page_token
+
+
 class Table(object):
 
     _client = None
@@ -103,60 +127,62 @@ class Table(object):
     def get(self, key):
         response = self._client.get_item(
             TableName=self._name,
-            Key=_to_attribute_dict(key)
+            Key=_to_attribute_dict(key),
         )
 
-        if "Item" in response:
+        try:
             return _from_attribute_dict(response["Item"])
-        else:
+        except KeyError:
             return None
 
-    def query(self, key_query, index=None):
+    def query(self, page_token, page_size, key_query, index=None):
         builder = conditions.ConditionExpressionBuilder()
         expr, names, values = builder.build_expression(key_query, True)
 
-        query_params = dict(
+        params = dict(
             TableName=self._name,
             KeyConditionExpression=expr,
             ExpressionAttributeNames=names,
-            ExpressionAttributeValues=_to_attribute_dict(values)
+            ExpressionAttributeValues=_to_attribute_dict(values),
+            Limit=page_size,
         )
 
         if index is not None:
-            query_params.update(dict(
+            params.update(dict(
                 IndexName=index,
-                Select="ALL_PROJECTED_ATTRIBUTES"
+                Select="ALL_PROJECTED_ATTRIBUTES",
             ))
 
-        response = self._client.query(**query_params)
+        if page_token is not None:
+            params.update(dict(
+                ExclusiveStartKey=_decode_token(page_token),
+            ))
 
-        if "Items" in response:
-            items = [_from_attribute_dict(item) for item in response["Items"]]
-            return items, ""
-        else:
-            return [], ""
+        return _paginated_response(self._client.query(**params))
 
-    def scan(self):
-        response = self._client.scan(
-            TableName=self._name
+    def scan(self, page_token, page_size):
+        params = dict(
+            TableName=self._name,
+            Limit=page_size,
         )
 
-        if "Items" in response:
-            items = [_from_attribute_dict(item) for item in response["Items"]]
-            return items, ""
-        else:
-            return [], ""
+        if page_token is not None:
+            params.update(dict(
+                ExclusiveStartKey=_decode_token(page_token),
+            ))
+
+        return _paginated_response(self._client.scan(**params))
 
     def put(self, item):
         self._client.put_item(
             TableName=self._name,
-            Item=_to_attribute_dict(item)
+            Item=_to_attribute_dict(item),
         )
 
     def delete(self, key):
         self._client.delete_item(
             TableName=self._name,
-            Key=_to_attribute_dict(key)
+            Key=_to_attribute_dict(key),
         )
 
 

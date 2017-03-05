@@ -24,7 +24,8 @@
         "stage": "prod"
     },
     "queryStringParameters": {
-        "foo": "bar"
+        "pageSize": 3,
+        "pageToken": "eyJkYXRlUHVibGlzaGVkIjogeyJTIjogIjIwMTctMDMtMDUgMDg6MTY6MzQuMzQ5NjcxIn0sICJwdWJsaWNhdGlvbiI6IHsiUyI6ICI4ZT AzMTU0NS1iYTY2LTExZTYtODE5My1hMDk5OWIwNWMwMjMifSwgImlkIjogeyJTIjogIjBiY2FiNjYyLTAxN2MtMTFlNy1hODliLTQ2NDJjYWQxNjNkOCJ9fQ=="
     },
     "headers": {
         "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
