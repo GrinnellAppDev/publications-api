@@ -55,12 +55,7 @@ class InvalidArticleError(HttpError):
 
 
 def validate_publication_id(pub_id, db):
-    get = db.publications.get_item(
-        Key={"id": pub_id},
-        ProjectionExpression="id"
-    )
-
-    if "Item" not in get:
+    if db.publications.get({"id": pub_id}) is None:
         raise InvalidPublicationError(pub_id)
 
 

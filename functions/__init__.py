@@ -23,7 +23,7 @@ import os
 import sys
 
 # directories to be exposed so the modules they contain can be imported
-GLOBAL_DIRS = "shared", "lib"
+GLOBAL_DIRS = "shared", "lib", "lib/repoze"
 
 # add each of GLOBAL_DIRS to sys.path
 root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")

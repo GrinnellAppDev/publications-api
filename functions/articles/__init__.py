@@ -30,39 +30,36 @@ import patch
 import delete
 
 
-db = Db()
-
-
 def articles_list(event, context):
     try:
-        return getlist.handler(event, context, db)
+        return getlist.handler(event, context, Db.get_instance())
     except HttpError as err:
         return err.to_response()
 
 
 def articles_get(event, context):
     try:
-        return get.handler(event, context, db)
+        return get.handler(event, context, Db.get_instance())
     except HttpError as err:
         return err.to_response()
 
 
 def articles_post(event, context):
     try:
-        return post.handler(event, context, db)
+        return post.handler(event, context, Db.get_instance())
     except HttpError as err:
         return err.to_response()
 
 
 def articles_patch(event, context):
     try:
-        return patch.handler(event, context, db)
+        return patch.handler(event, context, Db.get_instance())
     except HttpError as err:
         return err.to_response()
 
 
 def articles_delete(event, context):
     try:
-        return delete.handler(event, context, db)
+        return delete.handler(event, context, Db.get_instance())
     except HttpError as err:
         return err.to_response()

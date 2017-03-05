@@ -25,11 +25,8 @@ from storage import Db
 import getlist
 
 
-db = Db()
-
-
 def publications_list(event, context):
     try:
-        return getlist.handler(event, context, db)
+        return getlist.handler(event, context, Db.get_instance())
     except HttpError as err:
         return err.to_response()

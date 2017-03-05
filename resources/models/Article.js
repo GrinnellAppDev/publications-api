@@ -7,7 +7,7 @@ module.exports.schema = () => ({
                "content", "authors"],
     additionalProperties: false,
     properties: Object.assign(require("./ShortArticle").schema().properties,
-                              require("./ArticleEdit").schema().properties, {
+                              require("./ArticleCreate").schema().properties, {
         dateEdited: Object.assign(require("./Date").schema(), {
             description: "The date and time the article was last edited",
         }),

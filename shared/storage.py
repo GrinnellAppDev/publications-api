@@ -28,9 +28,136 @@ from __future__ import print_function, division
 
 import os
 
+from lru import lru_cache
 import boto3
 import botocore
 from boto3.dynamodb import conditions
+
+
+def _to_attribute(obj):
+    if type(obj) in (str, unicode):
+        return {"S": obj}
+    if type(obj) in (int, float):
+        return {"N": str(obj)}
+    if type(obj) == list:
+        return {"L": [_to_attribute(item) for item in obj]}
+    if type(obj) == dict:
+        attrs = {}
+        for name, value in obj.iteritems():
+            attrs[name] = _to_attribute(value)
+        return {"M": attrs}
+
+    # We haven't implemented all supported attribute types yet
+    raise NotImplementedError("Cannot handle {}".format(type(obj)))
+
+
+def _to_attribute_dict(dictionary):
+    assert type(dictionary) == dict
+    return _to_attribute(dictionary)["M"]
+
+
+def _from_attribute(attribute):
+    if "S" in attribute:
+        return attribute["S"]
+    if "N" in attribute:
+        try:
+            return int(attribute["N"])
+        except ValueError:
+            return float(attribute["N"])
+    if "L" in attribute:
+        return [_from_attribute(item) for item in attribute["L"]]
+    if "M" in attribute:
+        dictionary = {}
+        for name, value in attribute["M"].iteritems():
+            dictionary[name] = _from_attribute(value)
+        return dictionary
+
+    # We haven't implemented all supported attribute types yet
+    raise NotImplementedError("Cannot handle {}".format(attribute))
+
+
+def _from_attribute_dict(attrs):
+    assert type(attrs) == dict
+    return _from_attribute({"M": attrs})
+
+
+class Table(object):
+
+    _client = None
+    _name = None
+
+    def __init__(self, client, name):
+        self._client = client
+        self._name = name
+
+    @property
+    @lru_cache(1)
+    def _query_paginator(self):
+        return self._client.get_paginator("query")
+
+    @property
+    @lru_cache(1)
+    def _scan_paginator(self):
+        return self._client.get_paginator("scan")
+
+    def get(self, key):
+        response = self._client.get_item(
+            TableName=self._name,
+            Key=_to_attribute_dict(key)
+        )
+
+        if "Item" in response:
+            return _from_attribute_dict(response["Item"])
+        else:
+            return None
+
+    def query(self, key_query, index=None):
+        builder = conditions.ConditionExpressionBuilder()
+        expr, names, values = builder.build_expression(key_query, True)
+
+        query_params = dict(
+            TableName=self._name,
+            KeyConditionExpression=expr,
+            ExpressionAttributeNames=names,
+            ExpressionAttributeValues=_to_attribute_dict(values)
+        )
+
+        if index is not None:
+            query_params.update(dict(
+                IndexName=index,
+                Select="ALL_PROJECTED_ATTRIBUTES"
+            ))
+
+        response = self._client.query(**query_params)
+
+        if "Items" in response:
+            items = [_from_attribute_dict(item) for item in response["Items"]]
+            return items, ""
+        else:
+            return [], ""
+
+    def scan(self):
+        response = self._client.scan(
+            TableName=self._name
+        )
+
+        if "Items" in response:
+            items = [_from_attribute_dict(item) for item in response["Items"]]
+            return items, ""
+        else:
+            return [], ""
+
+    def put(self, item):
+        self._client.put_item(
+            TableName=self._name,
+            Item=_to_attribute_dict(item)
+        )
+
+    def delete(self, key):
+        self._client.delete_item(
+            TableName=self._name,
+            Key=_to_attribute_dict(key)
+        )
 
 
 class Db(object):
@@ -38,34 +165,32 @@ class Db(object):
     Key = conditions.Key
     Attr = conditions.Attr
 
-    _resource = None
-    _articles_table = None
-    _publications_table = None
-    _series_table = None
+    SHORT_ARTICLES_BY_DATE_INDEX = "ShortArticlesByDate"
 
-    def __init__(self):
-        self._resource = boto3.resource("dynamodb")
+    @classmethod
+    @lru_cache(1)
+    def get_instance(cls):
+        return cls()
 
     @property
+    @lru_cache(1)
+    def _client(self):
+        return boto3.client("dynamodb")
+
+    @property
+    @lru_cache(1)
     def publications(self):
-        if self._publications_table is None:
-            name = os.environ["PUBLICATIONS_TABLE_NAME"]
-            self._publications_table = self._resource.Table(name)
-        return self._publications_table
+        return Table(self._client, os.environ["PUBLICATIONS_TABLE_NAME"])
 
     @property
+    @lru_cache(1)
     def series(self):
-        if self._series_table is None:
-            name = os.environ["SERIES_TABLE_NAME"]
-            self._series_table = self._resource.Table(name)
-        return self._series_table
+        return Table(self._client, os.environ["SERIES_TABLE_NAME"])
 
     @property
+    @lru_cache(1)
     def articles(self):
-        if self._articles_table is None:
-            name = os.environ["ARTICLES_TABLE_NAME"]
-            self._articles_table = self._resource.Table(name)
-        return self._articles_table
+        return Table(self._client, os.environ["ARTICLES_TABLE_NAME"])
 
 
 class SimpleStorage(object):

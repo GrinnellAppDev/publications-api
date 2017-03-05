@@ -21,15 +21,35 @@ Type: AWS::DynamoDB::Table
 Properties:
   TableName: ${file(serverless.yml):custom.resourceNames.articlesTable}
   AttributeDefinitions:
-    - AttributeName: publication
-      AttributeType: S
-    - AttributeName: id
-      AttributeType: S
+    - AttributeType: S
+      AttributeName: publication
+    - AttributeType: S
+      AttributeName: id
+    - AttributeType: S
+      AttributeName: datePublished
+    # - AttributeType: S
+    #   AttributeName: headerImage
+    # - AttributeType: S
+    #   AttributeName: title
   KeySchema:
-    - AttributeName: publication
-      KeyType: HASH
-    - AttributeName: id
-      KeyType: RANGE
+    - KeyType: HASH
+      AttributeName: publication
+    - KeyType: RANGE
+      AttributeName: id
   ProvisionedThroughput:
     ReadCapacityUnits: 5
     WriteCapacityUnits: 5
+  LocalSecondaryIndexes:
+    - IndexName: ShortArticlesByDate
+      KeySchema:
+        - KeyType: HASH
+          AttributeName: publication
+        - KeyType: RANGE
+          AttributeName: datePublished
+      Projection:
+        ProjectionType: INCLUDE
+        NonKeyAttributes:
+          - id
+          - headerImage
+          - title
+          - authors

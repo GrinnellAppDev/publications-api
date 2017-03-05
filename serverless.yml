@@ -60,7 +60,7 @@ custom:
 
   resourceNames:
     imagesBucket: ${self:service}-${self:custom.stage}-images
-    articlesTable: ${self:service}-${self:custom.stage}-articles
+    articlesTable: ${self:service}-${self:custom.stage}-articles2
     publicationsTable: ${self:service}-${self:custom.stage}-publications
     seriesTable: ${self:service}-${self:custom.stage}-series
 

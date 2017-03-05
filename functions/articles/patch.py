@@ -42,17 +42,17 @@ def handler(event, context, db):
 
     deep_empty_string_clean(new_fields)
 
-    articles_get = db.articles.get_item(
-        Key={"publication": publication_id, "id": article_id}
-    )
+    article = db.articles.get({
+        "publication": publication_id,
+        "id": article_id,
+    })
 
-    if "Item" not in articles_get:
+    if article is None:
         raise InvalidArticleError(article_id)
 
-    article = articles_get["Item"]
     article.update(new_fields)
 
-    db.articles.put_item(Item=article)
+    db.articles.put(article)
 
     assert event["path"][-1] != "/"
 

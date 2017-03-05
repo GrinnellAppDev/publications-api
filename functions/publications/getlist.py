@@ -25,11 +25,11 @@ from response import create_json_response
 def handler(event, context, db):
     assert event["httpMethod"] == "GET"
 
-    publications_get = db.publications.scan()
+    publications, next_page_token = db.publications.scan()
 
-    if "Items" in publications_get:
-        publications_list = publications_get["Items"]
-    else:
-        publications_list = []
+    response = {
+        "items": publications,
+        "nextPageToken": next_page_token,
+    }
 
-    return create_json_response(200, body=publications_list)
+    return create_json_response(200, body=response)

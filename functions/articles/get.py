@@ -32,11 +32,12 @@ def handler(event, context, db):
 
     validate_publication_id(publication_id, db)
 
-    articles_get = db.articles.get_item(
-        Key={"publication": publication_id, "id": article_id}
-    )
+    article = db.articles.get({
+        "publication": publication_id,
+        "id": article_id,
+    })
 
-    if "Item" not in articles_get:
+    if article is None:
         raise InvalidArticleError(article_id)
 
-    return create_json_response(200, body=articles_get["Item"])
+    return create_json_response(200, body=article)

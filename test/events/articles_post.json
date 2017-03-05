@@ -1,5 +1,5 @@
 {
-    "body": "{\"title\": \"Wilson cutting Appdev funding\",\"content\": \"Appdev has recently come under fire!\",\"authors\": [{\"name\":\"Solomon Grundy\", \"email\": \"grundyso@grinnell.edu\"}, {\"name\": \"\", \"email\": \"\"}], \"tags\": [\"\"], \"brief\" : \"Following a recent \\\"State of SHACS\\\" presentation, some students were displeased.\", \"headerImage\": \"\"}",
+    "body": "{\"title\": \"Wilson cutting Appdev funding\",\"content\": \"Appdev has recently come under fire!  Following a recent \\\"State of SHACS\\\" presentation, some students were displeased.\",\"authors\": [{\"name\":\"Solomon Grundy\", \"email\": \"grundyso@grinnell.edu\"}, {\"name\": \"\", \"email\": \"\"}], \"tags\": [\"\"], \"headerImage\": \"\"}",
     "resource": "/{proxy+}",
     "queryStringParameters": {
         "foo": "bar"

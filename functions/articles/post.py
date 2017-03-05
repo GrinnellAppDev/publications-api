@@ -45,7 +45,7 @@ def handler(event, context, db):
     article["publication"] = publication_id
     article["datePublished"] = str(datetime.datetime.utcnow())
 
-    db.articles.put_item(Item=article)
+    db.articles.put(article)
 
     assert event["path"][-1] != "/"
 
