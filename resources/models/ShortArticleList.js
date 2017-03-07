@@ -10,5 +10,10 @@ module.exports.schema = () => ({
             type: "array",
             items: require("./ShortArticle").schema(),
         },
+        nextPageToken: {
+            type: "string",
+            description: "A token to pass to the next request.  Will be null " +
+                         "if there is no next page.",
+        },
     },
 });
