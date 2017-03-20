@@ -58,6 +58,12 @@ custom:
         description: ${file(resources/models/PublicationList.js):schema.description}
         schema: ${file(resources/models/PublicationList.js):schema}
 
+      # Models representing URL query parameters
+      - name: PagingParams
+        contentType: application/json
+        description: ${file(resources/models/PagingParams.js):schema.description}
+        schema: ${file(resources/models/PagingParams.js):schema}
+
   resourceNames:
     imagesBucket: ${self:service}-${self:custom.stage}-images
     articlesTable: ${self:service}-${self:custom.stage}-articles2
@@ -123,6 +129,8 @@ functions:
           cors: true
           documentation:
             description: List all publications.
+            requestModels:
+              application/json: PagingParams
             methodResponses:
               - statusCode: 200
                 responseModels:
@@ -178,6 +186,8 @@ functions:
           cors: true
           documentation:
             description: List all articles.
+            requestModels:
+              application/json: PagingParams
             methodResponses:
               - statusCode: 200
                 responseModels:
