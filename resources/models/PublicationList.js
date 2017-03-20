@@ -12,8 +12,8 @@ module.exports.schema = () => ({
         },
         nextPageToken: {
             type: "string",
-            description: "A token to pass to the next request.  Will be null " +
-                         "if there is no next page.",
+            description: "A token to pass to the next request.  Will be " +
+                         "absent if there is no next page.",
         },
     },
 });

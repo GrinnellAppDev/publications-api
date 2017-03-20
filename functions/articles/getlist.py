@@ -51,7 +51,9 @@ def handler(event, context, db):
 
     response = {
         "items": articles,
-        "nextPageToken": next_page_token,
     }
+
+    if next_page_token is not None:
+        response["nextPageToken"] = next_page_token
 
     return create_json_response(200, body=response)
