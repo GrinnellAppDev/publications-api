@@ -33,10 +33,11 @@ you want to test. To test a function with that input data:
 `yarn run func -- function_name stagename`.
 
 ### Export Documentation
-To export documentation for a stage to swagger, first ensure it is deployed,
-then: `yarn run swagger -- stagename`. The docs will be available at
+To export documentation for a stage to swagger, run:
+`yarn run swagger -- stagename`. The docs will be available at
 `http://publications-docs.s3-website.us-east-2.amazonaws.com/?stage=stagename`
-where you substitute in your stage name at the end of the URL.
+where you substitute in your stage name at the end of the URL.  Note that this
+will also deploy that stage.
 
 ### Deploy Production
 Be careful with this one, we should all probably talk before we use it.  The
