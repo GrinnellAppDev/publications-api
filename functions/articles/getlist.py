@@ -19,6 +19,10 @@
 
 from __future__ import print_function, division
 
+import base64
+import uuid
+import struct
+
 from response import create_json_response
 from validate import validate_publication_id
 
@@ -32,9 +36,18 @@ def handler(event, context, db):
     query_params = event["queryStringParameters"]
 
     if query_params is not None and "pageToken" in query_params:
-        page_token = query_params["pageToken"]
+        page_key_id, page_key_date = struct.unpack(
+            ">16sQ",
+            base64.urlsafe_b64decode(str(query_params["pageToken"]))
+        )
+
+        page_key = {
+            "publication": {"S": publication_id},
+            "id": {"S": str(uuid.UUID(bytes=page_key_id))},
+            "datePublished": {"N": str(page_key_date)},
+        }
     else:
-        page_token = None
+        page_key = None
 
     if query_params is not None and "pageSize" in query_params:
         page_size = int(query_params["pageSize"])
@@ -43,8 +56,8 @@ def handler(event, context, db):
 
     validate_publication_id(publication_id, db)
 
-    articles, next_page_token = db.articles.query(
-        page_token, page_size,
+    articles, next_page_key = db.articles.query(
+        page_key, page_size,
         db.Key("publication").eq(publication_id),
         index=db.SHORT_ARTICLES_BY_DATE_INDEX
     )
@@ -53,7 +66,11 @@ def handler(event, context, db):
         "items": articles,
     }
 
-    if next_page_token is not None:
-        response["nextPageToken"] = next_page_token
+    if next_page_key is not None:
+        response["nextPageToken"] = base64.urlsafe_b64encode(struct.pack(
+            ">16sQ",
+            uuid.UUID(next_page_key["id"]["S"]).bytes,
+            int(next_page_key["datePublished"]["N"])
+        ))
 
     return create_json_response(200, body=response)

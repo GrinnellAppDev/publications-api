@@ -28,7 +28,6 @@ from __future__ import print_function, division
 
 import os
 import json
-import base64
 
 from lru import lru_cache
 import boto3
@@ -83,14 +82,6 @@ def _from_attribute_dict(attrs):
     return _from_attribute({"M": attrs})
 
 
-def _encode_token(obj):
-    return base64.b64encode(json.dumps(obj))
-
-
-def _decode_token(token):
-    return json.loads(base64.b64decode(token))
-
-
 def _paginated_response(response):
     try:
         items = [_from_attribute_dict(item) for item in response["Items"]]
@@ -98,11 +89,11 @@ def _paginated_response(response):
         items = []
 
     try:
-        next_page_token = _encode_token(response["LastEvaluatedKey"])
+        next_page_key = response["LastEvaluatedKey"]
     except KeyError:
-        next_page_token = None
+        next_page_key = None
 
-    return items, next_page_token
+    return items, next_page_key
 
 
 class Table(object):
@@ -135,7 +126,7 @@ class Table(object):
         except KeyError:
             return None
 
-    def query(self, page_token, page_size, key_query, index=None):
+    def query(self, page_key, page_size, key_query, index=None):
         builder = conditions.ConditionExpressionBuilder()
         expr, names, values = builder.build_expression(key_query, True)
 
@@ -153,22 +144,22 @@ class Table(object):
                 Select="ALL_PROJECTED_ATTRIBUTES",
             ))
 
-        if page_token is not None:
+        if page_key is not None:
             params.update(dict(
-                ExclusiveStartKey=_decode_token(page_token),
+                ExclusiveStartKey=page_key,
             ))
 
         return _paginated_response(self._client.query(**params))
 
-    def scan(self, page_token, page_size):
+    def scan(self, page_key, page_size):
         params = dict(
             TableName=self._name,
             Limit=page_size,
         )
 
-        if page_token is not None:
+        if page_key is not None:
             params.update(dict(
-                ExclusiveStartKey=_decode_token(page_token),
+                ExclusiveStartKey=page_key,
             ))
 
         return _paginated_response(self._client.scan(**params))

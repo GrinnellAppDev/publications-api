@@ -19,6 +19,9 @@
 
 from __future__ import print_function, division
 
+import base64
+import uuid
+
 from response import create_json_response
 
 
@@ -28,22 +31,28 @@ def handler(event, context, db):
     query_params = event["queryStringParameters"]
 
     if query_params is not None and "pageToken" in query_params:
-        page_token = query_params["pageToken"]
+        page_key = {
+            "id": {"S": str(uuid.UUID(
+                bytes=base64.urlsafe_b64decode(str(query_params["pageToken"]))
+            ))}
+        }
     else:
-        page_token = None
+        page_key = None
 
     if query_params is not None and "pageSize" in query_params:
         page_size = int(query_params["pageSize"])
     else:
         page_size = 20
 
-    publications, next_page_token = db.publications.scan(page_token, page_size)
+    publications, next_page_key = db.publications.scan(page_key, page_size)
 
     response = {
         "items": publications,
     }
 
-    if next_page_token is not None:
-        response["nextPageToken"] = next_page_token
+    if next_page_key is not None:
+        response["nextPageToken"] = base64.urlsafe_b64encode(
+            uuid.UUID(next_page_key["id"]["S"]).bytes
+        )
 
     return create_json_response(200, body=response)
