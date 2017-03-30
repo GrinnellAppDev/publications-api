@@ -8,8 +8,10 @@ module.exports.schema = () => ({
     additionalProperties: false,
     properties: Object.assign(require("./ShortArticle").schema().properties,
                               require("./ArticleCreate").schema().properties, {
-        dateEdited: Object.assign(require("./Date").schema(), {
-            description: "The date and time the article was last edited",
-        }),
+        dateEdited: {
+            type: "number",
+            description: "The timestamp the article was last edited as a " +
+                         "Unix timestamp in milliseconds",
+        },
     }),
 });

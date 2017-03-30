@@ -25,7 +25,7 @@ Properties:
       AttributeName: publication
     - AttributeType: S
       AttributeName: id
-    - AttributeType: S
+    - AttributeType: N
       AttributeName: datePublished
     # - AttributeType: S
     #   AttributeName: headerImage

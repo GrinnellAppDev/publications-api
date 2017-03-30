@@ -21,7 +21,7 @@ from __future__ import print_function, division
 
 import json
 import uuid
-import datetime
+import time
 
 from response import create_json_response, HttpError
 from validate import validate_publication_id, deep_empty_string_clean
@@ -43,7 +43,7 @@ def handler(event, context, db):
     article_id = str(uuid.uuid1())
     article["id"] = article_id
     article["publication"] = publication_id
-    article["datePublished"] = str(datetime.datetime.utcnow())
+    article["datePublished"] = int(time.time() * 1000)
 
     db.articles.put(article)
 

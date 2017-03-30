@@ -12,9 +12,11 @@ module.exports.schema = () => ({
         publication: Object.assign(require("./UUID").schema(), {
             description: "The unique ID of the article's publication",
         }),
-        datePublished: Object.assign(require("./Date").schema(), {
-            description: "The date and time the article was published",
-        }),
+        datePublished: {
+            type: "number",
+            description: "The timestamp the article was published as a Unix " +
+                         "timestamp in milliseconds",
+        },
         headerImage: Object.assign(require("./URL").schema(), {
             description: "The URL of the header image"
         }),
