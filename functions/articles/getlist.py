@@ -35,9 +35,10 @@ def handler(event, context, db):
 
     query_params = event["queryStringParameters"]
 
+    PAGE_TOKEN_STRUCT_FORMAT = ">16sQ"
     if query_params is not None and "pageToken" in query_params:
         page_key_id, page_key_date = struct.unpack(
-            ">16sQ",
+            PAGE_TOKEN_STRUCT_FORMAT,
             base64.urlsafe_b64decode(str(query_params["pageToken"]))
         )
 
@@ -68,7 +69,7 @@ def handler(event, context, db):
 
     if next_page_key is not None:
         response["nextPageToken"] = base64.urlsafe_b64encode(struct.pack(
-            ">16sQ",
+            PAGE_TOKEN_STRUCT_FORMAT,
             uuid.UUID(next_page_key["id"]["S"]).bytes,
             int(next_page_key["datePublished"]["N"])
         ))
