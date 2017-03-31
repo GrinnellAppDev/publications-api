@@ -53,7 +53,7 @@ def handler(event, context, db):
     if query_params is not None and "pageSize" in query_params:
         page_size = int(query_params["pageSize"])
     else:
-        page_size = 20
+        page_size = 30
 
     validate_publication_id(publication_id, db)
 
