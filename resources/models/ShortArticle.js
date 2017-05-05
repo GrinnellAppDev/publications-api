@@ -3,7 +3,8 @@ module.exports.schema = () => ({
     title: "ShortArticle",
     description: "Shortened article with only the information needed to show " +
                  "it in a listview",
-    required: ["id", "publication", "datePublished", "title", "authors"],
+    required: ["id", "publication", "datePublished", "title", "authors",
+               "readTimeMinutes"],
     additionalProperties: false,
     properties: {
         id: Object.assign(require("./UUID").schema(), {
@@ -28,6 +29,11 @@ module.exports.schema = () => ({
             type: "array",
             description: "A list of all collaborators on the article",
             items: require("./Author").schema(),
+        },
+        readTimeMinutes: {
+            type: "number",
+            description: "The amount of time in minutes it should take the " +
+                         "average college student to read the article.",
         },
     },
 });

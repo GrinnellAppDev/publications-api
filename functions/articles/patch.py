@@ -26,6 +26,7 @@ import datetime
 from response import create_json_response, HttpError
 from validate import (validate_publication_id, deep_empty_string_clean,
                       InvalidArticleError)
+from readtime import get_read_time_minutes
 
 
 def handler(event, context, db):
@@ -50,8 +51,10 @@ def handler(event, context, db):
     if article is None:
         raise InvalidArticleError(article_id)
 
-    article.update(new_fields)
+    read_time = get_read_time_minutes(new_fields["content"])
+    new_fields["readTimeMinutes"] = read_time
 
+    article.update(new_fields)
     db.articles.put(article)
 
     assert event["path"][-1] != "/"

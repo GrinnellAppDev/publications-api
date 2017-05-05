@@ -25,6 +25,7 @@ import time
 
 from response import create_json_response, HttpError
 from validate import validate_publication_id, deep_empty_string_clean
+from readtime import get_read_time_minutes
 
 
 def handler(event, context, db):
@@ -44,6 +45,7 @@ def handler(event, context, db):
     article["id"] = article_id
     article["publication"] = publication_id
     article["datePublished"] = int(time.time() * 1000)
+    article["readTimeMinutes"] = get_read_time_minutes(article["content"])
 
     db.articles.put(article)
 
