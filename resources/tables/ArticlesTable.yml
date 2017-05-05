@@ -53,3 +53,4 @@ Properties:
           - headerImage
           - title
           - authors
+          - readTimeMinutes
