@@ -126,9 +126,10 @@ class Table(object):
         except KeyError:
             return None
 
-    def query(self, page_key, page_size, key_query, index=None):
+    def query(self, page_key, page_size, key_query, index=None, reverse=False):
         builder = conditions.ConditionExpressionBuilder()
         expr, names, values = builder.build_expression(key_query, True)
+        scan_forward = not reverse
 
         params = dict(
             TableName=self._name,
@@ -136,6 +137,7 @@ class Table(object):
             ExpressionAttributeNames=names,
             ExpressionAttributeValues=_to_attribute_dict(values),
             Limit=page_size,
+            ScanIndexForward=scan_forward,
         )
 
         if index is not None:

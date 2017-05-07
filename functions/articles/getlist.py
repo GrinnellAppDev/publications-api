@@ -60,7 +60,8 @@ def handler(event, context, db):
     articles, next_page_key = db.articles.query(
         page_key, page_size,
         db.Key("publication").eq(publication_id),
-        index=db.SHORT_ARTICLES_BY_DATE_INDEX
+        index=db.SHORT_ARTICLES_BY_DATE_INDEX,
+        reverse=True
     )
 
     response = {
