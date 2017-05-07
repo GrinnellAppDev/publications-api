@@ -120,6 +120,10 @@ package:
 
 
 functions:
+  authorizer:
+    handler: authorizer.handler
+    runtime: nodejs6.10
+
   publications_list:
     handler: functions.publications_list
     events:
@@ -199,6 +203,7 @@ functions:
           method: POST
           path: /publications/{publicationId}/articles
           cors: true
+          authorizer: authorizer
           documentation:
             description: Create a new article.
             requestModels:
@@ -227,6 +232,7 @@ functions:
           method: PATCH
           path: /publications/{publicationId}/articles/{articleId}
           cors: true
+          authorizer: authorizer
           documentation:
             description: Update an exsisting article.
             requestModels:
@@ -242,6 +248,7 @@ functions:
           method: DELETE
           path: /publications/{publicationId}/articles/{articleId}
           cors: true
+          authorizer: authorizer
           documentation:
             description: Delete an article.
             methodResponses:

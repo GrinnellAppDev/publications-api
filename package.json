@@ -15,5 +15,10 @@
   "devDependencies": {
     "serverless": "^1.6.1",
     "serverless-aws-documentation": "^0.5.7"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^7.0.0",
+    "jwk-to-pem": "^1.2.5",
+    "request": "^2.72.0"
   }
 }
