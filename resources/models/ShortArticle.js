@@ -33,7 +33,7 @@ module.exports.schema = () => ({
         readTimeMinutes: {
             type: "number",
             description: "The amount of time in minutes it should take the " +
-                         "average college student to read the article.",
+                         "average college student to read the article",
         },
     },
 });
