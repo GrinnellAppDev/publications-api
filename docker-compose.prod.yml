@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  api:
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+  apidb:
+    restart: unless-stopped
+
+  auth:
+    restart: unless-stopped
+  authdb:
+    restart: unless-stopped
