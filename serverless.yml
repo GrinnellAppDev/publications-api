@@ -1,0 +1,282 @@
+##
+# serverless.yml
+#
+# Copyright (C) 2016  Grinnell AppDev.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+
+# For full config options, check the docs:
+#    https://serverless.com/framework/docs/
+
+service: publications
+frameworkVersion: "=1.6.1"
+
+plugins:
+  - serverless-aws-documentation
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
+
+  documentation:
+    summary: Publications API
+    description: Access and manage publications and articles.
+    resources:
+      - path: /publications
+        description: List publications.
+    models:
+      - name: ShortArticleList
+        contentType: application/json
+        description: ${file(resources/models/ShortArticleList.js):schema.description}
+        schema: ${file(resources/models/ShortArticleList.js):schema}
+      - name: ArticleCreate
+        contentType: application/json
+        description: ${file(resources/models/ArticleCreate.js):schema.description}
+        schema: ${file(resources/models/ArticleCreate.js):schema}
+      - name: ArticleEdit
+        contentType: application/json
+        description: ${file(resources/models/ArticleEdit.js):schema.description}
+        schema: ${file(resources/models/ArticleEdit.js):schema}
+      - name: Article
+        contentType: application/json
+        description: ${file(resources/models/Article.js):schema.description}
+        schema: ${file(resources/models/Article.js):schema}
+      - name: PublicationList
+        contentType: application/json
+        description: ${file(resources/models/PublicationList.js):schema.description}
+        schema: ${file(resources/models/PublicationList.js):schema}
+
+      # Models representing URL query parameters
+      - name: PagingParams
+        contentType: application/json
+        description: ${file(resources/models/PagingParams.js):schema.description}
+        schema: ${file(resources/models/PagingParams.js):schema}
+
+  resourceNames:
+    imagesBucket: ${self:service}-${self:custom.stage}-images
+    articlesTable: ${self:service}-${self:custom.stage}-articles
+    publicationsTable: ${self:service}-${self:custom.stage}-publications
+    seriesTable: ${self:service}-${self:custom.stage}-series
+
+
+provider:
+  name: aws
+  runtime: python2.7
+  stage: dev
+  region: us-west-2
+
+  # forwards compatibility, see
+  # https://serverless.com/framework/docs/providers/aws/guide/functions#log-group-resources
+  cfLogs: true
+
+  environment:
+    IMAGES_BUCKET_NAME: ${self:custom.resourceNames.imagesBucket}
+    ARTICLES_TABLE_NAME: ${self:custom.resourceNames.articlesTable}
+    PUBLICATIONS_TABLE_NAME: ${self:custom.resourceNames.publicationsTable}
+    SERIES_TABLE_NAME: ${self:custom.resourceNames.seriesTable}
+  #   API_ID: ${self:custom.apiId}
+  #   BUCKET_ID: ${self:custom.bucketId}
+
+  # you can add statements to the Lambda function's IAM Role here
+  # see http://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:*"
+
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::publications-*"
+
+
+package:
+  exclude:
+    - .idea/**
+    - .vscode/**
+    - test/**
+
+    # don't exclude this until we know we want to use boto3 to fetch our schemas
+    # - resources/**
+
+
+functions:
+  authorizer:
+    handler: authorizer.handler
+    runtime: nodejs6.10
+
+  publications_list:
+    handler: functions.publications_list
+    events:
+      - http:
+          method: GET
+          path: /publications
+          cors: true
+          documentation:
+            description: List all publications.
+            requestModels:
+              application/json: PagingParams
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: PublicationList
+  # publications_post:
+  #   handler: functions.publications_post
+  #   description: Add a new publication.
+  #   events:
+  #     - http: POST /publications
+  # publications_patch:
+  #   handler: functions.publications_patch
+  #   description: Update an exsisting publication.
+  #   events:
+  #     - http: PATCH /publications/{publicationId}
+  # publications_delete:
+  #   handler: functions.publications_delete
+  #   description: Delete a publication.
+  #   events:
+  #     - http: DELETE /publications/{publicationId}
+
+  # series_list:
+  #   handler: functions.series_list
+  #   description: List all series.
+  #   events:
+  #     - http: GET /publications/{publicationId}/series
+  # series_post:
+  #   handler: functions.series_post
+  #   description: Create a new series.
+  #   events:
+  #     - http: POST /publications/{publicationId}/series
+  # series_get:
+  #   handler: functions.series_get
+  #   description: Get an series through an ID.
+  #   events:
+  #     - http: GET /publications/{publicationId}/series/{seriesId}
+  # series_patch:
+  #   handler: functions.series_patch
+  #   description: Update an exsisting series.
+  #   events:
+  #     - http: PATCH /publications/{publicationId}/series/{seriesId}
+  # series_delete:
+  #   handler: functions.series_delete
+  #   description: Delete an series.
+  #   events:
+  #     - http: DELETE /publications/{publicationId}/series/{seriesId}
+
+  articles_list:
+    handler: functions.articles_list
+    events:
+      - http:
+          method: GET
+          path: /publications/{publicationId}/articles
+          cors: true
+          documentation:
+            description: List all articles.
+            requestModels:
+              application/json: PagingParams
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: ShortArticleList
+  articles_post:
+    handler: functions.articles_post
+    events:
+      - http:
+          method: POST
+          path: /publications/{publicationId}/articles
+          cors: true
+          authorizer: authorizer
+          documentation:
+            description: Create a new article.
+            requestModels:
+              application/json: ArticleCreate
+            methodResponses:
+              - statusCode: 201
+                responseModels:
+                  application/json: Article
+  articles_get:
+    handler: functions.articles_get
+    events:
+      - http:
+          method: GET
+          path: /publications/{publicationId}/articles/{articleId}
+          cors: true
+          documentation:
+            description: Get an article through an ID.
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: Article
+  articles_patch:
+    handler: functions.articles_patch
+    events:
+      - http:
+          method: PATCH
+          path: /publications/{publicationId}/articles/{articleId}
+          cors: true
+          authorizer: authorizer
+          documentation:
+            description: Update an exsisting article.
+            requestModels:
+              application/json: ArticleEdit
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: Article
+  articles_delete:
+    handler: functions.articles_delete
+    events:
+      - http:
+          method: DELETE
+          path: /publications/{publicationId}/articles/{articleId}
+          cors: true
+          authorizer: authorizer
+          documentation:
+            description: Delete an article.
+            methodResponses:
+              - statusCode: 200
+                responseModels:
+                  application/json: Article
+
+  # images_post:
+  #   handler: functions.images_post
+  #   description: Create a new image.
+  #   events:
+  #     - http: POST /images
+  # images_get:
+  #   handler: functions.images_get
+  #   desription: Get an image through an ID.
+  #   events:
+  #     - http: GET /images/{imageId}
+  # images_put:
+  #   handler: functions.images_put
+  #   description: Update an exsisting image.
+  #   events:
+  #     - http: PUT /images/{imageId}
+  # images_delete:
+  #   handler: functions.images_delete
+  #   description: Delete a image.
+  #   events:
+  #     - http: DELETE /images/{imageId}
+
+
+resources:
+  Resources: ${file(resources/Resources.yml)}
