@@ -2,7 +2,6 @@ version: "3.1"
 
 services:
   api:
-    container_name: sparc-api-prod
     image: sparc-api
     build: ./api
     networks:
@@ -26,7 +25,6 @@ services:
       - "27017"
 
   auth:
-    container_name: sparc-auth-prod
     image: sparc-auth
     build: ./api
     command: node auth.js
