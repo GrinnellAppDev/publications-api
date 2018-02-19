@@ -1,104 +1,135 @@
 openapi: 3.0.0
 
 info:
-  title: Cloud Services Training API
+  title: SPARC Publications API
   version: 1.0.0
 
 components:
   propSchemas:
-    TaskId:
+    ArticleId:
+      description: The unique ID of the article
       type: string
-      description: The unique ID of the task.
-      format: objectId
-    TaskText:
+    ArticlePublication:
+      description: The unique ID of the article's publication
       type: string
-      description: The text content of the task.
-    TaskIsComplete:
-      type: boolean
-      description: Whether the task has been checked off.
-
-    UserEmail:
+    ArticleTitle:
+      description: The headline of the article
       type: string
-      format: email
-    UserName:
+    ArticleDatePublished:
+      description: >
+        The timestamp the article was published as a Unix timestamp in
+        milliseconds.
+      type: number
+    ArticleDateEdited:
+      description: >
+        The timestamp the article was last edited as a Unix timestamp in
+        milliseconds.
+      type: number
+    ArticleReadTimeMinutes:
+      description: >
+        The amount of time in minutes it should take the average college
+        student to read the article.
+      type: number
+    ArticleHeaderImage:
+      description: The URI of the header image
       type: string
-      description: The user's preferred name.
+      format: uri
+    ArticleContent:
+      description: The full text of the article formatted with markdown
+      type: string
+    ArticleAuthors:
+      description: A list of all collaborators on the article
+      items:
+        $ref: "#/components/schemas/Author"
+      type: array
 
   schemas:
-    TaskCreate:
-      type: object
+    Publication:
       properties:
-        text:
-          $ref: "#/components/propSchemas/TaskText"
+        id:
+          type: string
+          description: The unique id of the publication
+        name:
+          type: string
+          description: The name of the publication
       required:
-        - text
+        - id
+        - name
       additionalProperties: false
 
-    TaskEdit:
+    Article:
       type: object
       properties:
-        text:
-          $ref: "#/components/propSchemas/TaskText"
-        isComplete:
-          $ref: "#/components/propSchemas/TaskIsComplete"
-      additionalProperties: false
-
-    Task:
-      type: object
-      properties:
-        _id:
-          $ref: "#/components/propSchemas/TaskId"
-        text:
-          $ref: "#/components/propSchemas/TaskText"
-        isComplete:
-          $ref: "#/components/propSchemas/TaskIsComplete"
+        id:
+          $ref: "#/components/propSchemas/ArticleId"
+        publication:
+          $ref: "#/components/propSchemas/ArticlePublication"
+        title:
+          $ref: "#/components/propSchemas/ArticleTitle"
+        datePublished:
+          $ref: "#/components/propSchemas/ArticleDatePublished"
+        dateEdited:
+          $ref: "#/components/propSchemas/ArticleDateEdited"
+        authors:
+          $ref: "#/components/propSchemas/ArticleAuthors"
+        headerImage:
+          $ref: "#/components/propSchemas/ArticleHeaderImage"
+        content:
+          $ref: "#/components/propSchemas/ArticleContent"
+        readTimeMinutes:
+          $ref: "#/components/propSchemas/ArticleReadTimeMinutes"
       required:
-        - _id
-        - text
-        - isComplete
+        - id
+        - publication
+        - title
+        - datePublished
+        - dateEdited
+        - authors
+        - content
+        - readTimeMinutes
       additionalProperties: false
 
-    UserCreate:
+    ArticleThumbnail:
+      description: >
+        Shortened article with only the information needed to show it in a
+        listview.
       type: object
+      properties:
+        id:
+          $ref: "#/components/propSchemas/ArticleId"
+        publication:
+          $ref: "#/components/propSchemas/ArticlePublication"
+        title:
+          $ref: "#/components/propSchemas/ArticleTitle"
+        datePublished:
+          $ref: "#/components/propSchemas/ArticleDatePublished"
+        authors:
+          $ref: "#/components/propSchemas/ArticleAuthors"
+        readTimeMinutes:
+          $ref: "#/components/propSchemas/ArticleReadTimeMinutes"
+        headerImage:
+          $ref: "#/components/propSchemas/ArticleHeaderImage"
+      required:
+        - id
+        - publication
+        - title
+        - datePublished
+        - authors
+        - readTimeMinutes
+      additionalProperties: false
+
+    Author:
+      required:
+        - name
+      additionalProperties: false
       properties:
         name:
-          $ref: "#/components/propSchemas/UserName"
+          description: The full name of the author
+          type: string
         email:
-          $ref: "#/components/propSchemas/UserEmail"
-        password:
+          description: The preferred email of the author
           type: string
-          minLength: 15
-      required:
-        - email
-        - password
-      additionalProperties: false
-
-    User:
-      type: object
-      properties:
-        name:
-          $ref: "#/components/propSchemas/UserName"
-        email:
-          $ref: "#/components/propSchemas/UserEmail"
-      required:
-        - email
-      additionalProperties: false
-
-    JwtCredentials:
-      type: object
-      properties:
-        token:
-          type: string
-          description: A short-lived token used to authenticate API endpoints.
-          format: jwt
-        tokenExpiration:
-          type: string
-          description: When accessToken will expire and need to be refreshed.
-          format: date-time
-      required:
-        - token
-        - tokenExpiration
-      additionalProperties: false
+          format: email
 
     Error:
       type: object
@@ -123,19 +154,3 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
-
-    Unauthorized:
-      description: The request didn't contain valid authorization.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Error"
-
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-
-    BearerAuth:
-      type: http
-      scheme: bearer
