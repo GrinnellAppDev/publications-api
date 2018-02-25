@@ -29,7 +29,7 @@ module.exports = Router()
      *            type: string
      *      responses:
      *        200:
-     *          description: An array of publications
+     *          description: A list of publications
      *          headers:
      *            Link:
      *              schema:
@@ -103,3 +103,58 @@ module.exports = Router()
             response.status(200).send(items)
         })
     )
+
+/**
+ * @swagger
+ *  /publications/{publicationId}/articles:
+ *    get:
+ *      summary: Get a list of article thumbnails in a particular publication
+ *      description:
+ *      parameters:
+ *        - name: pageSize
+ *          in: query
+ *          description: Maximum number of items per response
+ *          schema:
+ *            type: integer
+ *            default: 10
+ *        - name: pageToken
+ *          in: query
+ *          description: Token representing a particular page of results
+ *          schema:
+ *            type: string
+ *      responses:
+ *        200:
+ *          description: A list of articles
+ *          headers:
+ *            Link:
+ *              schema:
+ *                type: string
+ *              description: >
+ *                Standard HTTP Link header. All URIs relative to the /publications endpoint.
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: array
+ *                items:
+ *                  $ref: "#/components/schemas/ArticleThumbnail"
+ *        400:
+ *          $ref: "#/components/responses/BadRequest"
+ *        404:
+ *          $ref: "#/components/responses/NotFound"
+ */
+
+/**
+ * @swagger
+ *  /publications/{publicationId}/articles/{articleId}:
+ *    get:
+ *      summary: Show detailed information on a particular article.
+ *      responses:
+ *        200:
+ *          description: A single article
+ *          content:
+ *            application/json:
+ *              schema:
+ *                $ref: "#/components/schemas/Article"
+ *        404:
+ *          $ref: "#/components/responses/NotFound"
+ */
