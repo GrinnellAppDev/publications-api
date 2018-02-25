@@ -12,7 +12,7 @@
       "address": "localhost",
       "port": 9222,
       "localRoot": "${workspaceFolder}/api",
-      "remoteRoot": "/var/api",
+      "remoteRoot": "/app",
       "restart": true
     },
     {
@@ -23,7 +23,7 @@
       "address": "localhost",
       "port": 9223,
       "localRoot": "${workspaceFolder}/api",
-      "remoteRoot": "/var/api",
+      "remoteRoot": "/app",
       "restart": true
     }
   ]
