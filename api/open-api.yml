@@ -4,6 +4,12 @@ info:
   title: SPARC Publications API
   version: 1.0.0
 
+servers:
+  - url: https://appdev.grinnell.edu/api/publications/v1/
+    description: Production server
+  - url: http://localhost:2000
+    description: Local development server
+
 components:
   propSchemas:
     ArticleId:
