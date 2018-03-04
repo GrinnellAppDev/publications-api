@@ -5,6 +5,6 @@ services:
     container_name: sparc-api-prod
     restart: unless-stopped
     ports:
-      - "8001:80"
+      - "8021:80"
   apidb:
     restart: unless-stopped
