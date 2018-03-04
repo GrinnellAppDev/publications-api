@@ -21,7 +21,6 @@ express()
   .use(helmet({ dnsPrefetchControl: false }))
   .use(express.json())
 
-  .get("/", (request, response) => response.redirect("./docs"))
   .use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec))
   .get("/docs.json", (request, response) =>
     response.status(200).send(swaggerSpec)
