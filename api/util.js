@@ -3,9 +3,6 @@ const { Buffer } = require("buffer")
 const urlsafeBase64 = require("urlsafe-base64")
 const jsonschema = require("jsonschema")
 const readYAML = require("read-yaml")
-const fs = require("fs")
-const jwt = require("jsonwebtoken")
-const authHeader = require("auth-header")
 const validUrl = require("valid-url")
 
 class HTTPError extends Error {
@@ -80,26 +77,6 @@ for (const schema in openApiComponents.propSchemas) {
     openApiComponents.propSchemas[schema],
     `/#/components/propSchemas/${schema}`
   )
-}
-
-const JWT_PUBLIC = fs.readFileSync("./jwt.key.pub")
-
-exports.authenticated = () => (request, response, next) => {
-  let token
-  try {
-    const auth = authHeader.parse(request.header("Authorization"))
-    if (auth.scheme !== "Bearer") {
-      throw new Error()
-    }
-
-    token = jwt.verify(auth.token, JWT_PUBLIC)
-  } catch (error) {
-    response.header("WWW-Authenticate", "Bearer")
-    throw new HTTPError(401, "Invalid token.")
-  }
-
-  request.authorizedUser = new ObjectId(token.sub)
-  next()
 }
 
 exports.validateRequest = (

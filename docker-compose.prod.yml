@@ -8,9 +8,3 @@ services:
       - "8001:80"
   apidb:
     restart: unless-stopped
-
-  auth:
-    container_name: sparc-auth-prod
-    restart: unless-stopped
-  authdb:
-    restart: unless-stopped

@@ -14,17 +14,6 @@
       "localRoot": "${workspaceFolder}/api",
       "remoteRoot": "/app",
       "restart": true
-    },
-    {
-      "type": "node",
-      "request": "attach",
-      "name": "Attach to Auth",
-      "protocol": "inspector",
-      "address": "localhost",
-      "port": 9223,
-      "localRoot": "${workspaceFolder}/api",
-      "remoteRoot": "/app",
-      "restart": true
     }
   ]
 }

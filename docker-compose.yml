@@ -9,10 +9,8 @@ services:
       - api
     depends_on:
       - apidb
-      - auth
     environment:
       - MONGO_URL=mongodb://apidb/
-      - AUTH_HOST=auth
 
   apidb:
     container_name: sparc-apidb
@@ -23,37 +21,8 @@ services:
       - apidb-data:/data/db
     expose:
       - "27017"
-
-  auth:
-    image: sparc-auth
-    build: ./api
-    command: node auth.js
-    networks:
-      - default
-      - auth
-    depends_on:
-      - authdb
-    environment:
-      - MONGO_URL=mongodb://authdb/
-    secrets:
-      - jwt.key
-
-  authdb:
-    container_name: sparc-authdb
-    image: mongo:3.4
-    networks:
-      - auth
-    volumes:
-      - authdb-data:/data/db
-
 volumes:
   apidb-data:
-  authdb-data:
 
 networks:
   api:
-  auth:
-
-secrets:
-  jwt.key:
-    file: ./secrets/jwt.key
