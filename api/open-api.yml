@@ -83,7 +83,6 @@ components:
         - publication
         - title
         - datePublished
-        - dateEdited
         - authors
         - content
         - readTimeMinutes
