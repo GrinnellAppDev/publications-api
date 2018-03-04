@@ -41,9 +41,16 @@ module.exports = Router()
    *          content:
    *            application/json:
    *              schema:
-   *                type: array
-   *                items:
-   *                  $ref: "#/components/schemas/Publication"
+   *                type: object
+   *                properties:
+   *                  items:
+   *                    type: array
+   *                    items:
+   *                      $ref: "#/components/schemas/Publication"
+   *                  nextPageToken:
+   *                    type: string
+   *                required:
+   *                  - items
    *        400:
    *          $ref: "#/components/responses/BadRequest"
    */
@@ -89,16 +96,20 @@ module.exports = Router()
       }))
 
       const nextPageFirstPublication = readPublications[pageSize]
+      let nextPageToken
+
       if (nextPageFirstPublication) {
+        nextPageToken = idToBase64(nextPageFirstPublication._id)
+
         response.links({
           next: `publications?${querystring.stringify({
             ...request.query,
-            pageToken: idToBase64(nextPageFirstPublication._id)
+            pageToken: nextPageToken
           })}`
         })
       }
 
-      response.status(200).send(items)
+      response.status(200).send({ items, nextPageToken })
     })
   )
 
@@ -137,9 +148,16 @@ module.exports = Router()
    *          content:
    *            application/json:
    *              schema:
-   *                type: array
-   *                items:
-   *                  $ref: "#/components/schemas/ArticleThumbnail"
+   *                type: object
+   *                properties:
+   *                  items:
+   *                    type: array
+   *                    items:
+   *                      $ref: "#/components/schemas/ArticleThumbnail"
+   *                  nextPageToken:
+   *                    type: string
+   *                required:
+   *                  - items
    *        400:
    *          $ref: "#/components/responses/BadRequest"
    *        404:
@@ -207,19 +225,21 @@ module.exports = Router()
       }))
 
       const nextPageFirstArticle = limitedArticles[pageSize]
+      let nextPageToken
+
       if (nextPageFirstArticle) {
+        // TODO: mash in the id for unique ordering
+        nextPageToken = numberToBase64(nextPageFirstArticle.datePublished)
+
         response.links({
           next: `articles?${querystring.stringify({
             ...request.query,
-            pageToken: numberToBase64(
-              nextPageFirstArticle.datePublished
-              // TODO: mash in the id for unique ordering
-            )
+            pageToken: nextPageToken
           })}`
         })
       }
 
-      response.status(200).send(items)
+      response.status(200).send({ items, nextPageToken })
     })
   )
 
