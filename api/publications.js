@@ -50,9 +50,6 @@ module.exports = Router()
    *                  nextPageToken:
    *                    type: string
    *                    nullable: true
-   *                required:
-   *                  - items
-   *                  - nextPageToken
    *        400:
    *          $ref: "#/components/responses/BadRequest"
    */
@@ -155,9 +152,6 @@ module.exports = Router()
    *                  nextPageToken:
    *                    type: string
    *                    nullable: true
-   *                required:
-   *                  - items
-   *                  - nextPageToken
    *        400:
    *          $ref: "#/components/responses/BadRequest"
    *        404:
