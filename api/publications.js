@@ -77,13 +77,9 @@ module.exports = Router()
         }
       }
 
-      const query = { _userId: request.authorizedUser }
       const allPublications = pageToken
-        ? publicationsCollection.find({
-            ...query,
-            _id: { $lte: pageTokenValue }
-          })
-        : publicationsCollection.find(query)
+        ? publicationsCollection.find({ _id: { $lte: pageTokenValue } })
+        : publicationsCollection.find()
 
       const readPublications = await allPublications
         .sort("_id", -1)
@@ -201,6 +197,10 @@ module.exports = Router()
         throw new HTTPError(404, `No publication with id "${publicationId}".`)
       }
 
+      await articlesCollection.createIndex({
+        publication: 1,
+        datePublished: -1
+      })
       const query = { publication: publicationId }
       const articles = pageToken
         ? articlesCollection.find({
@@ -298,6 +298,10 @@ module.exports = Router()
         throw new HTTPError(404, `No publication with id "${publicationId}".`)
       }
 
+      await articlesCollection.createIndex(
+        { publication: 1, id: 1 },
+        { unique: true }
+      )
       const article = await articlesCollection
         .find({
           publication: publicationId,
