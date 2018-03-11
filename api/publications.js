@@ -49,8 +49,10 @@ module.exports = Router()
    *                      $ref: "#/components/schemas/Publication"
    *                  nextPageToken:
    *                    type: string
+   *                    nullable: true
    *                required:
    *                  - items
+   *                  - nextPageToken
    *        400:
    *          $ref: "#/components/responses/BadRequest"
    */
@@ -92,7 +94,7 @@ module.exports = Router()
       }))
 
       const nextPageFirstPublication = readPublications[pageSize]
-      let nextPageToken
+      let nextPageToken = null
 
       if (nextPageFirstPublication) {
         nextPageToken = idToBase64(nextPageFirstPublication._id)
@@ -152,8 +154,10 @@ module.exports = Router()
    *                      $ref: "#/components/schemas/ArticleThumbnail"
    *                  nextPageToken:
    *                    type: string
+   *                    nullable: true
    *                required:
    *                  - items
+   *                  - nextPageToken
    *        400:
    *          $ref: "#/components/responses/BadRequest"
    *        404:
@@ -219,13 +223,16 @@ module.exports = Router()
         publication: article.publication,
         title: article.title,
         datePublished: article.datePublished,
-        authors: article.authors,
+        authors: article.authors.map(author => ({
+          ...author,
+          email: author.email || null
+        })),
         readTimeMinutes: article.readTimeMinutes,
-        headerImage: article.headerImage
+        headerImage: article.headerImage || null
       }))
 
       const nextPageFirstArticle = limitedArticles[pageSize]
-      let nextPageToken
+      let nextPageToken = null
 
       if (nextPageFirstArticle) {
         // TODO: mash in the id for unique ordering
@@ -323,8 +330,11 @@ module.exports = Router()
         title: article.title,
         datePublished: article.datePublished,
         dateEdited: article.dateEdited,
-        authors: article.authors,
-        headerImage: article.headerImage,
+        authors: article.authors.map(author => ({
+          ...author,
+          email: author.email || null
+        })),
+        headerImage: article.headerImage || null,
         content: article.content,
         readTimeMinutes: article.readTimeMinutes
       })

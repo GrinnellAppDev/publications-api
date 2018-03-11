@@ -40,6 +40,7 @@ components:
       description: The URI of the header image
       type: string
       format: uri
+      nullable: true
     ArticleContent:
       description: The full text of the article formatted with markdown
       type: string
@@ -58,10 +59,6 @@ components:
         name:
           type: string
           description: The name of the publication
-      required:
-        - id
-        - name
-      additionalProperties: false
 
     Article:
       type: object
@@ -84,15 +81,6 @@ components:
           $ref: "#/components/propSchemas/ArticleContent"
         readTimeMinutes:
           $ref: "#/components/propSchemas/ArticleReadTimeMinutes"
-      required:
-        - id
-        - publication
-        - title
-        - datePublished
-        - authors
-        - content
-        - readTimeMinutes
-      additionalProperties: false
 
     ArticleThumbnail:
       description: >
@@ -114,19 +102,8 @@ components:
           $ref: "#/components/propSchemas/ArticleReadTimeMinutes"
         headerImage:
           $ref: "#/components/propSchemas/ArticleHeaderImage"
-      required:
-        - id
-        - publication
-        - title
-        - datePublished
-        - authors
-        - readTimeMinutes
-      additionalProperties: false
 
     Author:
-      required:
-        - name
-      additionalProperties: false
       properties:
         name:
           description: The full name of the author
@@ -135,15 +112,13 @@ components:
           description: The preferred email of the author
           type: string
           format: email
+          nullable: true
 
     Error:
       type: object
       properties:
         message:
           type: string
-      required:
-        - message
-      additionalProperties: false
 
   responses:
     BadRequest:
