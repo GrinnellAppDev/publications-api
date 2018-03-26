@@ -31,11 +31,11 @@ the dropdown.
 ### Production Environment
 
 Run `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build`
-to start a production server. Alternatively, run `./redeploy.sh` to
-pull from GitHub and run production in the background. Either way,
-the production api will be available on <http://localhost:8001>.
+to start a production server. Alternatively, run `./restart.sh` to run
+production in the background. Either way, the production api will be
+available on <http://localhost:8001>.
 
 ### Deploying
 
-When deploying on a server, ssh-ing in and running `./redeploy.sh` is usually
-the way to go.
+When deploying on a server, ssh in, `git pull`, then run `./restart.sh` to
+rebuild and restart the docker services.
