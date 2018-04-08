@@ -1,0 +1,14 @@
+version: "3.1"
+
+services:
+  api:
+    container_name: sparc-api-dev
+    volumes:
+      - ./api/jwt.key.pub.example:/app/jwt.key.pub
+      - ./api:/app
+    environment:
+      - NODE_ENV=development
+    command: yarn start
+    ports:
+      - "2000:80"
+      - "9222:9222"

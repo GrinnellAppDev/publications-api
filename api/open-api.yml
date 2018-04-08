@@ -1,0 +1,136 @@
+openapi: 3.0.0
+
+info:
+  title: SPARC Publications API
+  version: 1.0.0
+
+servers:
+  - url: https://appdev.grinnell.edu/api/publications/v1/
+    description: Production server
+  - url: http://localhost:2000
+    description: Local development server
+
+components:
+  propSchemas:
+    ArticleId:
+      description: The unique ID of the article
+      type: string
+    ArticlePublication:
+      description: The unique ID of the article's publication
+      type: string
+    ArticleTitle:
+      description: The headline of the article
+      type: string
+    ArticleDatePublished:
+      description: >
+        The timestamp the article was published as a Unix timestamp in
+        milliseconds.
+      type: number
+    ArticleDateEdited:
+      description: >
+        The timestamp the article was last edited as a Unix timestamp in
+        milliseconds.
+      type: number
+    ArticleReadTimeMinutes:
+      description: >
+        The amount of time in minutes it should take the average college
+        student to read the article.
+      type: number
+    ArticleHeaderImage:
+      description: The URI of the header image
+      type: string
+      format: uri
+      nullable: true
+    ArticleContent:
+      description: The full text of the article formatted with markdown
+      type: string
+    ArticleAuthors:
+      description: A list of all collaborators on the article
+      items:
+        $ref: "#/components/schemas/Author"
+      type: array
+
+  schemas:
+    Publication:
+      properties:
+        id:
+          type: string
+          description: The unique id of the publication
+        name:
+          type: string
+          description: The name of the publication
+
+    Article:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/propSchemas/ArticleId"
+        publication:
+          $ref: "#/components/propSchemas/ArticlePublication"
+        title:
+          $ref: "#/components/propSchemas/ArticleTitle"
+        datePublished:
+          $ref: "#/components/propSchemas/ArticleDatePublished"
+        dateEdited:
+          $ref: "#/components/propSchemas/ArticleDateEdited"
+        authors:
+          $ref: "#/components/propSchemas/ArticleAuthors"
+        headerImage:
+          $ref: "#/components/propSchemas/ArticleHeaderImage"
+        content:
+          $ref: "#/components/propSchemas/ArticleContent"
+        readTimeMinutes:
+          $ref: "#/components/propSchemas/ArticleReadTimeMinutes"
+
+    ArticleThumbnail:
+      description: >
+        Shortened article with only the information needed to show it in a
+        listview.
+      type: object
+      properties:
+        id:
+          $ref: "#/components/propSchemas/ArticleId"
+        publication:
+          $ref: "#/components/propSchemas/ArticlePublication"
+        title:
+          $ref: "#/components/propSchemas/ArticleTitle"
+        datePublished:
+          $ref: "#/components/propSchemas/ArticleDatePublished"
+        authors:
+          $ref: "#/components/propSchemas/ArticleAuthors"
+        readTimeMinutes:
+          $ref: "#/components/propSchemas/ArticleReadTimeMinutes"
+        headerImage:
+          $ref: "#/components/propSchemas/ArticleHeaderImage"
+
+    Author:
+      properties:
+        name:
+          description: The full name of the author
+          type: string
+        email:
+          description: The preferred email of the author
+          type: string
+          format: email
+          nullable: true
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+
+  responses:
+    BadRequest:
+      description: The request is incorrectly formatted.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    NotFound:
+      description: The requested resource could not be found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
