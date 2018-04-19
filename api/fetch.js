@@ -36,7 +36,8 @@ const fetchSAndB = async () => {
       )
     } catch (error) {
       console.error(error)
-      if (attempts > 5) {
+      const MAX_ATTEMPTS = 5
+      if (attempts > MAX_ATTEMPTS) {
         throw new Error("Max fetch attempts made.  Exiting.")
       } else {
         console.error("Retrying fetch...")
@@ -65,10 +66,12 @@ const fetchSAndB = async () => {
               .replace(/^By /, "")
 
             if (authorName) {
-              authorEmail =
-                decodeEntities(
-                  authorP.children.find(node => node.type === "text").data
-                ).trim() || null
+              const emailWrapper = authorP.children.find(
+                node => node.type === "text"
+              )
+              if (emailWrapper) {
+                authorEmail = decodeEntities(emailWrapper.data).trim() || null
+              }
 
               contentAst.splice(0, 1)
             }
@@ -105,41 +108,40 @@ const fetchSAndB = async () => {
   try {
     await runWithDB(async db => {
       const articlesCollection = db.collection("articles")
-      let articles
-      if (
-        (await articlesCollection.count({ publication: PUBLICATION_ID })) > 0
-      ) {
-        const fetchUnknown = async (startPage = 0) => {
-          const removeKnownArticles = async ([article, ...otherArticles]) => {
-            if (!article) {
-              return []
-            } else if (
-              await articlesCollection.find({ id: article.id }).hasNext()
-            ) {
-              // Article is already in the database
-              return removeKnownArticles(otherArticles)
-            } else {
-              // Article is new
-              return [article, ...removeKnownArticles(otherArticle)]
-            }
-          }
-
-          const articles = await removeKnownArticles(
-            await fetchArticles(startPage, 10)
-          )
-
-          // Keep fetching until page 20 or a page contains only known articles
-          if (articles.length > 0 && startPage < 20) {
-            return [...articles, ...fetchUnknown(startPage + 1)]
+      const fetchUnknown = async (startPage = 0) => {
+        const removeKnownArticles = async ([article, ...otherArticles]) => {
+          if (!article) {
+            return []
+          } else if (
+            await articlesCollection.find({ id: article.id }).hasNext()
+          ) {
+            // Article is already in the database
+            return removeKnownArticles(otherArticles)
           } else {
-            return articles
+            // Article is new
+            return [article, ...removeKnownArticles(otherArticle)]
           }
         }
 
-        articles = await fetchUnknown()
-      } else {
-        articles = await fetchArticles(0, 10)
+        const PAGE_SIZE = 10
+        const articles = await removeKnownArticles(
+          await fetchArticles(startPage, PAGE_SIZE)
+        )
+
+        // Keep fetching until page 20 or a page contains only known articles
+        const MAX_PAGES = 20
+        if (articles.length > 0 && startPage < MAX_PAGES) {
+          return [...articles, ...fetchUnknown(startPage + 1)]
+        } else {
+          return articles
+        }
       }
+
+      const MAX_INITIAL_LOAD = 100
+      const articles =
+        (await articlesCollection.count({ publication: PUBLICATION_ID })) > 0
+          ? await fetchUnknown()
+          : await fetchArticles(0, MAX_INITIAL_LOAD)
 
       if (articles.length > 0) {
         const insertResult = await articlesCollection.insertMany(articles)
