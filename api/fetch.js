@@ -86,6 +86,10 @@ const fetchSAndB = async () => {
           ignoreHref: true,
           ignoreImage: true
         })
+        const wordCount = content.split(/\s+/).filter(s => s.length > 0).length
+        // Average college student reading speed in words per minute
+        const AVERAGE_WPM = 300
+        const readTimeMinutes = Math.ceil(wordCount / AVERAGE_WPM)
 
         return {
           id: post.id,
@@ -98,8 +102,7 @@ const fetchSAndB = async () => {
             ? post.thumbnail_images.large.url
             : null,
           content,
-          // TODO: calculate from plaintext content
-          readTimeMinutes: 0
+          readTimeMinutes
         }
       })
     )
@@ -108,32 +111,31 @@ const fetchSAndB = async () => {
   try {
     await runWithDB(async db => {
       const articlesCollection = db.collection("articles")
-      const fetchUnknown = async (startPage = 0) => {
-        const removeKnownArticles = async ([article, ...otherArticles]) => {
-          if (!article) {
-            return []
-          } else if (
-            await articlesCollection.find({ id: article.id }).hasNext()
-          ) {
-            // Article is already in the database
-            return removeKnownArticles(otherArticles)
-          } else {
-            // Article is new
-            return [article, ...removeKnownArticles(otherArticle)]
-          }
+      const removeKnownArticles = async ([article, ...otherArticles]) => {
+        if (!article) {
+          return []
+        } else if (
+          await articlesCollection.find({ id: article.id }).hasNext()
+        ) {
+          // Article is already in the database
+          return removeKnownArticles(otherArticles)
+        } else {
+          // Article is new
+          return [article, ...removeKnownArticles(otherArticle)]
         }
-
+      }
+      const fetchUnknown = async (startPage = 0) => {
         const PAGE_SIZE = 10
-        const articles = await removeKnownArticles(
+        const newArticles = await removeKnownArticles(
           await fetchArticles(startPage, PAGE_SIZE)
         )
 
-        // Keep fetching until page 20 or a page contains only known articles
+        // Keep fetching until page 20 or a page contains no new articles
         const MAX_PAGES = 20
-        if (articles.length > 0 && startPage < MAX_PAGES) {
-          return [...articles, ...fetchUnknown(startPage + 1)]
+        if (newArticles.length > 0 && startPage < MAX_PAGES) {
+          return [...newArticles, ...fetchUnknown(startPage + 1)]
         } else {
-          return articles
+          return newArticles
         }
       }
 
