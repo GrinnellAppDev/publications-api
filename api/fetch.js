@@ -24,12 +24,26 @@ const parseHtml = htmlString =>
 const decodeEntities = text => new htmlEntities.AllHtmlEntities().decode(text)
 
 const fetchSAndB = async () => {
+  console.info(`${new Date()} -- Fetching from S&B`)
+
   const PUBLICATION_ID = "s-and-b"
 
-  const fetchArticles = async limit => {
-    const response = await fetch(
-      `http://www.thesandb.com/?json=get_recent_posts&count=${limit}`
-    )
+  const fetchArticles = async (page, limit, attempts = 0) => {
+    let response
+    try {
+      response = await fetch(
+        `http://www.thesandb.com/?json=get_recent_posts&page=${page}&count=${limit}`
+      )
+    } catch (error) {
+      console.error(error)
+      if (attempts > 5) {
+        throw new Error("Max fetch attempts made.  Exiting.")
+      } else {
+        console.error("Retrying fetch...")
+        return await fetchArticles(page, limit, attempts + 1)
+      }
+    }
+
     const json = await response.json()
 
     return await Promise.all(
@@ -91,20 +105,56 @@ const fetchSAndB = async () => {
   try {
     await runWithDB(async db => {
       const articlesCollection = db.collection("articles")
+      let articles
       if (
         (await articlesCollection.count({ publication: PUBLICATION_ID })) > 0
       ) {
-        console.log("there are articles")
+        const fetchUnknown = async (startPage = 0) => {
+          const removeKnownArticles = async ([article, ...otherArticles]) => {
+            if (!article) {
+              return []
+            } else if (
+              await articlesCollection.find({ id: article.id }).hasNext()
+            ) {
+              // Article is already in the database
+              return removeKnownArticles(otherArticles)
+            } else {
+              // Article is new
+              return [article, ...removeKnownArticles(otherArticle)]
+            }
+          }
+
+          const articles = await removeKnownArticles(
+            await fetchArticles(startPage, 10)
+          )
+
+          if (articles.length > 0) {
+            return [...articles, ...fetchUnknown(startPage + 1)]
+          } else {
+            return articles
+          }
+        }
+
+        articles = await fetchUnknown()
       } else {
-        const articles = await fetchArticles(10)
+        articles = await fetchArticles(0, 10)
+      }
+
+      if (articles.length > 0) {
         const insertResult = await articlesCollection.insertMany(articles)
         if (!insertResult.result.ok) {
-          throw "Database insert failed"
+          throw new Error("Database insert failed")
+        } else {
+          console.info(`Downloaded ${insertResult.insertedCount} articles`)
         }
+      } else {
+        console.info("No new articles")
       }
     })
   } catch (error) {
     console.error(error)
+  } finally {
+    console.info(`${new Date()} -- end S&B fetch\n`)
   }
 }
 
