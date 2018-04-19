@@ -128,7 +128,8 @@ const fetchSAndB = async () => {
             await fetchArticles(startPage, 10)
           )
 
-          if (articles.length > 0) {
+          // Keep fetching until page 20 or a page contains only known articles
+          if (articles.length > 0 && startPage < 20) {
             return [...articles, ...fetchUnknown(startPage + 1)]
           } else {
             return articles
