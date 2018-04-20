@@ -136,8 +136,8 @@ const fetchSAndB = async () => {
           id: String(post.id),
           publication: PUBLICATION_ID,
           title: decodeEntities(post.title_plain).trim(),
-          datePublished: new Date(post.date).valueOf(),
-          dateEdited: new Date(post.modified).valueOf(),
+          datePublished: new Date(post.date).getTime(),
+          dateEdited: new Date(post.modified).getTime(),
           authors,
           headerImage:
             post.thumbnail_images && post.thumbnail_images.large
@@ -167,41 +167,43 @@ const fetchSAndB = async () => {
       console.info(`Scanning past ${NUM_PAGES * PAGE_SIZE} articles...`)
 
       await Promise.all(
-        pageNumbersToFetch.map(async pageNumber => {
-          const articlesFetched = await fetchArticles(pageNumber, PAGE_SIZE)
+        pageNumbersToFetch
+          .map(async pageNumber => {
+            const articlesFetched = await fetchArticles(pageNumber, PAGE_SIZE)
 
-          await Promise.all(
-            articlesFetched
-              .map(async fetchedArticle => {
-                const articleCursor = articlesCollection.find({
-                  id: fetchedArticle.id,
-                  publication: PUBLICATION_ID
-                })
-                if (await articleCursor.hasNext()) {
-                  // Maybe update the article
-                  const savedArticle = await articleCursor.next()
-                  if (!isEqual(omit(savedArticle, ["_id"]), fetchedArticle)) {
-                    const replaceResult = await articlesCollection.replaceOne(
-                      { _id: savedArticle._id },
+            await Promise.all(
+              articlesFetched
+                .map(async fetchedArticle => {
+                  const articleCursor = articlesCollection.find({
+                    id: fetchedArticle.id,
+                    publication: PUBLICATION_ID
+                  })
+                  if (await articleCursor.hasNext()) {
+                    // Maybe update the article
+                    const savedArticle = await articleCursor.next()
+                    if (!isEqual(omit(savedArticle, ["_id"]), fetchedArticle)) {
+                      const replaceResult = await articlesCollection.replaceOne(
+                        { _id: savedArticle._id },
+                        fetchedArticle
+                      )
+
+                      if (replaceResult.result.ok) numUpdatedArticles++
+                      else console.error("Failed to replace article.")
+                    }
+                  } else {
+                    // Add the article
+                    const insertResult = await articlesCollection.insertOne(
                       fetchedArticle
                     )
 
-                    if (replaceResult.result.ok) numUpdatedArticles++
-                    else console.error("Failed to replace article.")
+                    if (insertResult.result.ok) numNewArticles++
+                    else console.error("Failed to insert article.")
                   }
-                } else {
-                  // Add the article
-                  const insertResult = await articlesCollection.insertOne(
-                    fetchedArticle
-                  )
-
-                  if (insertResult.result.ok) numNewArticles++
-                  else console.error("Failed to insert article.")
-                }
-              })
-              .map(promise => promise.catch(console.error))
-          )
-        })
+                })
+                .map(promise => promise.catch(console.error))
+            )
+          })
+          .map(promise => promise.catch(console.error))
       )
 
       console.info(
@@ -215,9 +217,11 @@ const fetchSAndB = async () => {
   }
 }
 
+const UTC_TO_CST_OFFSET = 6
 schedule.scheduleJob(
   "fetch-s-and-b",
-  { hour: 6, minute: 0 }, // Every day at 6:00 am
+  // Every day at 5:00 am CST (6:00 am during daylight savings)
+  { hour: 5 + UTC_TO_CST_OFFSET, minute: 0 },
   fetchSAndB
 )
 
