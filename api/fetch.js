@@ -31,6 +31,8 @@ const fetchSAndB = async () => {
   const fetchArticles = async (page, limit, attempts = 0) => {
     let response
     try {
+      // DANGER ZONE: we have to fetch in the clear because the S&B does not
+      // support HTTPS
       response = await fetch(
         `http://www.thesandb.com/?json=get_recent_posts&page=${page}&count=${limit}`
       )

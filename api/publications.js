@@ -133,7 +133,10 @@ module.exports = Router()
    *            type: string
    *      responses:
    *        200:
-   *          description: A list of articles
+   *          description: >
+   *            A list of articles. This is **not** trusted data. The structure is
+   *            guaranteed, but the contents of the fields could be crafted by an
+   *            attacker, so take care.
    *          headers:
    *            Link:
    *              schema:
@@ -264,7 +267,10 @@ module.exports = Router()
    *            type: string
    *      responses:
    *        200:
-   *          description: A single article
+   *          description: >
+   *            A single article. This is **not** trusted data. The structure is
+   *            guaranteed, but the contents of the fields could be crafted by an
+   *            attacker, so take care.
    *          content:
    *            application/json:
    *              schema:
