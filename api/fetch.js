@@ -45,6 +45,12 @@ const fetchSAndB = async () => {
       }
     }
 
+    if (!response.ok) {
+      throw new Error(
+        `Request failed with status ${response.status}: ${response.statusText}`
+      )
+    }
+
     const json = await response.json()
 
     return await Promise.all(
@@ -201,12 +207,10 @@ const fetchSAndB = async () => {
   }
 }
 
-fetchSAndB()
+schedule.scheduleJob(
+  "fetch-s-and-b",
+  { hour: 6, minute: 0 }, // Every day at 6:00 am
+  fetchSAndB
+)
 
-if (process.env.NODE_ENV === "production") {
-  schedule.scheduleJob(
-    "fetch-s-and-b",
-    { dayOfWeek: 5, hour: 6, minute: 0 }, // Every Friday at 6:00 am
-    fetchSAndB
-  )
-}
+fetchSAndB()
