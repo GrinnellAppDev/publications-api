@@ -116,8 +116,6 @@ const fetchSAndB = async () => {
           authorEmail = null
         }
 
-        if (authorName) console.log(authorName, " ", authorEmail)
-
         const authors = authorName
           ? [{ name: authorName, email: authorEmail }]
           : []
