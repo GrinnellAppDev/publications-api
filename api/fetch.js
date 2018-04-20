@@ -24,7 +24,7 @@ const parseHtml = htmlString =>
 const decodeEntities = text => new htmlEntities.AllHtmlEntities().decode(text)
 
 const fetchSAndB = async () => {
-  console.info(`${new Date()} -- Fetching from S&B`)
+  console.info(`${new Date()} -- Begin S&B fetch.`)
 
   const PUBLICATION_ID = "s-and-b"
 
@@ -54,47 +54,52 @@ const fetchSAndB = async () => {
         const contentAst = await parseHtml(post.content)
         const AUTHOR_NODE_INDEX = 0
         const authorNode = contentAst[AUTHOR_NODE_INDEX]
-        const authorLine = htmlToText
-          .fromString(domUtils.getInnerHTML(authorNode), {
-            wordwrap: false,
-            ignoreHref: true,
-            ignoreImage: true
-          })
-          .split(/\s+/)
-          .filter(string => string.length > 0)
         let authorName = null
         let authorEmail = null
 
-        const authorLineHasBold =
-          authorNode.type === "tag" &&
-          domUtils.existsOne(
-            node => node.type === "tag" && node.name === "strong",
-            authorNode.children
+        if (authorNode) {
+          const authorLine = htmlToText
+            .fromString(domUtils.getInnerHTML(authorNode), {
+              wordwrap: false,
+              ignoreHref: true,
+              ignoreImage: true
+            })
+            .split(/\s+/)
+            .filter(string => string.length > 0)
+
+          const authorLineHasBold =
+            authorNode.type === "tag" &&
+            domUtils.existsOne(
+              node => node.type === "tag" && node.name === "strong",
+              authorNode.children
+            )
+          const authorLineHasBy = /[Bb]y/.test(authorLine[0])
+
+          // Remove a leading "By "
+          if (authorLineHasBy) {
+            authorLine.splice(0, 1)
+          }
+
+          // Look for an email and splice it out if found
+          const emailIndex = authorLine.findIndex(word =>
+            /[\w\.]+@[\w\.]+/.test(word)
           )
-        const authorLineHasBy = /[Bb]y/.test(authorLine[0])
+          if (emailIndex >= 0) {
+            authorEmail = authorLine
+              .splice(emailIndex, 1)[0]
+              .toLocaleLowerCase()
+          }
 
-        // Remove a leading "By "
-        if (authorLineHasBy) {
-          authorLine.splice(0, 1)
-        }
-
-        // Look for an email and splice it out if found
-        const emailIndex = authorLine.findIndex(word =>
-          /[\w\.]+@[\w\.]+/.test(word)
-        )
-        if (emailIndex >= 0) {
-          authorEmail = authorLine.splice(emailIndex, 1)[0].toLocaleLowerCase()
-        }
-
-        // Try to guess if the first line contains an author. If so, splice the
-        // line out of the content
-        if (
-          authorLine.length > 1 &&
-          authorLine.length < 5 &&
-          (authorLineHasBold || authorLineHasBy)
-        ) {
-          authorName = authorLine.join(" ")
-          contentAst.splice(AUTHOR_NODE_INDEX, 1)
+          // Try to guess if the first line contains an author. If so, splice the
+          // line out of the content
+          if (
+            authorLine.length > 1 &&
+            authorLine.length < 5 &&
+            (authorLineHasBold || authorLineHasBy)
+          ) {
+            authorName = authorLine.join(" ")
+            contentAst.splice(AUTHOR_NODE_INDEX, 1)
+          }
         }
 
         const authors = authorName
@@ -120,9 +125,10 @@ const fetchSAndB = async () => {
           datePublished: new Date(post.date).valueOf(),
           dateEdited: new Date(post.modified).valueOf(),
           authors,
-          headerImage: post.thumbnail_images
-            ? post.thumbnail_images.large.url
-            : null,
+          headerImage:
+            post.thumbnail_images && post.thumbnail_images.large
+              ? post.thumbnail_images.large.url
+              : null,
           content,
           readTimeMinutes
         }
@@ -131,58 +137,64 @@ const fetchSAndB = async () => {
   }
 
   try {
-    await fetchArticles(3, 200)
     await runWithDB(async db => {
       const articlesCollection = db.collection("articles")
-      const removeKnownArticles = async ([article, ...otherArticles]) => {
-        if (!article) {
-          return []
-        } else if (
-          await articlesCollection.find({ id: article.id }).hasNext()
-        ) {
-          // Article is already in the database
-          return removeKnownArticles(otherArticles)
-        } else {
-          // Article is new
-          return [article, ...removeKnownArticles(otherArticle)]
-        }
-      }
-      const fetchUnknown = async (startPage = 1) => {
-        const PAGE_SIZE = 10
-        const newArticles = await removeKnownArticles(
-          await fetchArticles(startPage, PAGE_SIZE)
-        )
 
-        // Keep fetching until page 20 or a page contains no new articles
-        const MAX_PAGES = 20
-        if (newArticles.length > 0 && startPage < MAX_PAGES) {
-          return [...newArticles, ...fetchUnknown(startPage + 1)]
-        } else {
-          return newArticles
-        }
+      let numNewArticles = 0
+      let numUpdatedArticles = 0
+
+      const NUM_PAGES = 5
+      const PAGE_SIZE = 200
+      const pageNumbersToFetch = []
+      for (let i = 0; i < NUM_PAGES; i++) {
+        pageNumbersToFetch[i] = i + 1
       }
 
-      const MAX_INITIAL_LOAD = 100
-      const articles =
-        (await articlesCollection.count({ publication: PUBLICATION_ID })) > 0
-          ? await fetchUnknown()
-          : await fetchArticles(0, MAX_INITIAL_LOAD)
+      await Promise.all(
+        pageNumbersToFetch.map(async pageNumber => {
+          const articlesFetched = await fetchArticles(pageNumber, PAGE_SIZE)
 
-      if (articles.length > 0) {
-        const insertResult = await articlesCollection.insertMany(articles)
-        if (!insertResult.result.ok) {
-          throw new Error("Database insert failed")
-        } else {
-          console.info(`Downloaded ${insertResult.insertedCount} articles`)
-        }
-      } else {
-        console.info("No new articles")
-      }
+          await Promise.all(
+            articlesFetched
+              .map(async fetchedArticle => {
+                const articleCursor = articlesCollection.find({
+                  id: fetchedArticle.id
+                })
+                if (await articleCursor.hasNext()) {
+                  // Maybe update the article
+                  const savedArticle = await articleCursor.next()
+                  if (savedArticle.dateEdited !== fetchedArticle.dateEdited) {
+                    const replaceResult = await articlesCollection.replaceOne(
+                      { _id: savedArticle._id },
+                      fetchedArticle
+                    )
+
+                    if (replaceResult.result.ok) numUpdatedArticles++
+                    else console.error("Failed to replace article.")
+                  }
+                } else {
+                  // Add the article
+                  const insertResult = await articlesCollection.insertOne(
+                    fetchedArticle
+                  )
+
+                  if (insertResult.result.ok) numNewArticles++
+                  else console.error("Failed to insert article.")
+                }
+              })
+              .map(promise => promise.catch(console.error))
+          )
+        })
+      )
+
+      console.info(
+        `Success.  Found ${numNewArticles} new articles.  Updated ${numUpdatedArticles} articles.`
+      )
     })
   } catch (error) {
     console.error(error)
   } finally {
-    console.info(`${new Date()} -- end S&B fetch\n`)
+    console.info(`${new Date()} -- End S&B fetch.\n`)
   }
 }
 
