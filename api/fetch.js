@@ -119,7 +119,7 @@ const fetchSAndB = async () => {
         const readTimeMinutes = Math.ceil(wordCount / AVERAGE_WORDS_PER_MINUTE)
 
         return {
-          id: post.id,
+          id: String(post.id),
           publication: PUBLICATION_ID,
           title: decodeEntities(post.title_plain).trim(),
           datePublished: new Date(post.date).valueOf(),
@@ -144,11 +144,13 @@ const fetchSAndB = async () => {
       let numUpdatedArticles = 0
 
       const NUM_PAGES = 5
-      const PAGE_SIZE = 200
+      const PAGE_SIZE = 400
       const pageNumbersToFetch = []
       for (let i = 0; i < NUM_PAGES; i++) {
         pageNumbersToFetch[i] = i + 1
       }
+
+      console.info(`Scanning past ${NUM_PAGES * PAGE_SIZE} articles...`)
 
       await Promise.all(
         pageNumbersToFetch.map(async pageNumber => {
@@ -158,7 +160,8 @@ const fetchSAndB = async () => {
             articlesFetched
               .map(async fetchedArticle => {
                 const articleCursor = articlesCollection.find({
-                  id: fetchedArticle.id
+                  id: fetchedArticle.id,
+                  publication: PUBLICATION_ID
                 })
                 if (await articleCursor.hasNext()) {
                   // Maybe update the article
