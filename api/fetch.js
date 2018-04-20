@@ -49,34 +49,57 @@ const fetchSAndB = async () => {
 
     return await Promise.all(
       json.posts.map(async post => {
+        // Try to scrape the author out of the HTML
+
         const contentAst = await parseHtml(post.content)
-        const authorP = contentAst[0]
+        const AUTHOR_NODE_INDEX = 0
+        const authorNode = contentAst[AUTHOR_NODE_INDEX]
+        const authorLine = htmlToText
+          .fromString(domUtils.getInnerHTML(authorNode), {
+            wordwrap: false,
+            ignoreHref: true,
+            ignoreImage: true
+          })
+          .split(/\s+/)
+          .filter(string => string.length > 0)
         let authorName = null
         let authorEmail = null
-        if (authorP.type === "tag" && authorP.name === "p") {
-          const authorNameWrapper = authorP.children.find(
-            node => node.type === "tag" && node.name === "strong"
+
+        const authorLineHasBold =
+          authorNode.type === "tag" &&
+          domUtils.existsOne(
+            node => node.type === "tag" && node.name === "strong",
+            authorNode.children
           )
-          if (authorNameWrapper) {
-            authorName = authorNameWrapper.children
-              .filter(node => node.type === "text")
-              .map(node => node.data.trim())
-              .join(" ")
-              .trim()
-              .replace(/^By /, "")
+        const authorLineHasBy = /[Bb]y/.test(authorLine[0])
 
-            if (authorName) {
-              const emailWrapper = authorP.children.find(
-                node => node.type === "text"
-              )
-              if (emailWrapper) {
-                authorEmail = decodeEntities(emailWrapper.data).trim() || null
-              }
-
-              contentAst.splice(0, 1)
-            }
-          }
+        // Remove a leading "By "
+        if (authorLineHasBy) {
+          authorLine.splice(0, 1)
         }
+
+        // Look for an email and splice it out if found
+        const emailIndex = authorLine.findIndex(word =>
+          /[\w\.]+@[\w\.]+/.test(word)
+        )
+        if (emailIndex >= 0) {
+          authorEmail = authorLine.splice(emailIndex, 1)[0].toLocaleLowerCase()
+        }
+
+        // Try to guess if the first line contains an author. If so, splice the
+        // line out of the content
+        if (
+          authorLine.length > 1 &&
+          authorLine.length < 5 &&
+          (authorLineHasBold || authorLineHasBy)
+        ) {
+          authorName = authorLine.join(" ")
+          contentAst.splice(AUTHOR_NODE_INDEX, 1)
+        }
+
+        const authors = authorName
+          ? [{ name: authorName, email: authorEmail }]
+          : []
 
         const contentHtml = contentAst
           .map(node => domUtils.getOuterHTML(node))
@@ -87,9 +110,8 @@ const fetchSAndB = async () => {
           ignoreImage: true
         })
         const wordCount = content.split(/\s+/).filter(s => s.length > 0).length
-        // Average college student reading speed in words per minute
-        const AVERAGE_WPM = 300
-        const readTimeMinutes = Math.ceil(wordCount / AVERAGE_WPM)
+        const AVERAGE_WORDS_PER_MINUTE = 300
+        const readTimeMinutes = Math.ceil(wordCount / AVERAGE_WORDS_PER_MINUTE)
 
         return {
           id: post.id,
@@ -97,7 +119,7 @@ const fetchSAndB = async () => {
           title: decodeEntities(post.title_plain).trim(),
           datePublished: new Date(post.date).valueOf(),
           dateEdited: new Date(post.modified).valueOf(),
-          authors: authorName ? [{ name: authorName, email: authorEmail }] : [],
+          authors,
           headerImage: post.thumbnail_images
             ? post.thumbnail_images.large.url
             : null,
@@ -109,6 +131,7 @@ const fetchSAndB = async () => {
   }
 
   try {
+    await fetchArticles(3, 200)
     await runWithDB(async db => {
       const articlesCollection = db.collection("articles")
       const removeKnownArticles = async ([article, ...otherArticles]) => {
@@ -124,7 +147,7 @@ const fetchSAndB = async () => {
           return [article, ...removeKnownArticles(otherArticle)]
         }
       }
-      const fetchUnknown = async (startPage = 0) => {
+      const fetchUnknown = async (startPage = 1) => {
         const PAGE_SIZE = 10
         const newArticles = await removeKnownArticles(
           await fetchArticles(startPage, PAGE_SIZE)
