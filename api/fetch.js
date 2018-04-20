@@ -5,6 +5,7 @@ const DomHandler = require("domhandler")
 const domUtils = require("domutils")
 const htmlEntities = require("html-entities")
 const htmlToText = require("html-to-text")
+const { isEqual, omit } = require("lodash")
 
 const { runWithDB } = require("./util")
 
@@ -32,7 +33,7 @@ const fetchSAndB = async () => {
     let response
     try {
       // DANGER ZONE: we have to fetch in the clear because the S&B does not
-      // support HTTPS
+      // support HTTPS. Thus, we cannot trust any of the data.
       response = await fetch(
         `http://www.thesandb.com/?json=get_recent_posts&page=${page}&count=${limit}`
       )
@@ -57,17 +58,15 @@ const fetchSAndB = async () => {
 
     return await Promise.all(
       json.posts.map(async post => {
-        // Try to scrape the author out of the HTML
-
         const contentAst = await parseHtml(post.content)
-        const AUTHOR_NODE_INDEX = 0
-        const authorNode = contentAst[AUTHOR_NODE_INDEX]
         let authorName = null
         let authorEmail = null
 
-        if (authorNode) {
+        // Try to scrape the author out of the HTML
+        for (const nodeIndex in contentAst) {
+          const node = contentAst[nodeIndex]
           const authorLine = htmlToText
-            .fromString(domUtils.getInnerHTML(authorNode), {
+            .fromString(domUtils.getInnerHTML(node), {
               wordwrap: false,
               ignoreHref: true,
               ignoreImage: true
@@ -76,10 +75,10 @@ const fetchSAndB = async () => {
             .filter(string => string.length > 0)
 
           const authorLineHasBold =
-            authorNode.type === "tag" &&
+            node.type === "tag" &&
             domUtils.existsOne(
               node => node.type === "tag" && node.name === "strong",
-              authorNode.children
+              node.children
             )
           const authorLineHasBy = /[Bb]y/.test(authorLine[0])
 
@@ -105,10 +104,19 @@ const fetchSAndB = async () => {
             authorLine.length < 5 &&
             (authorLineHasBold || authorLineHasBy)
           ) {
-            authorName = authorLine.join(" ")
-            contentAst.splice(AUTHOR_NODE_INDEX, 1)
+            // Clean up commas and colons
+            authorName = authorLine.join(" ").split(",")[0]
+            if (!/:/.test(authorName)) {
+              contentAst.splice(nodeIndex, 1)
+              break
+            }
           }
+
+          authorName = null
+          authorEmail = null
         }
+
+        if (authorName) console.log(authorName, " ", authorEmail)
 
         const authors = authorName
           ? [{ name: authorName, email: authorEmail }]
@@ -174,7 +182,7 @@ const fetchSAndB = async () => {
                 if (await articleCursor.hasNext()) {
                   // Maybe update the article
                   const savedArticle = await articleCursor.next()
-                  if (savedArticle.dateEdited !== fetchedArticle.dateEdited) {
+                  if (!isEqual(omit(savedArticle, ["_id"]), fetchedArticle)) {
                     const replaceResult = await articlesCollection.replaceOne(
                       { _id: savedArticle._id },
                       fetchedArticle
