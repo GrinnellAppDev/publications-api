@@ -8,6 +8,7 @@ const htmlToText = require("html-to-text")
 const { isEqual, omit } = require("lodash")
 
 const { runWithDB } = require("./util")
+const { sAndB } = require("./publications-available")
 
 const parseHtml = htmlString =>
   new Promise((resolve, reject) => {
@@ -26,8 +27,6 @@ const decodeEntities = text => new htmlEntities.AllHtmlEntities().decode(text)
 
 const fetchSAndB = async () => {
   console.info(`${new Date()} -- Begin S&B fetch.`)
-
-  const PUBLICATION_ID = "s-and-b"
 
   const fetchArticles = async (page, limit, attempts = 0) => {
     let response
@@ -134,7 +133,7 @@ const fetchSAndB = async () => {
 
         return {
           id: String(post.id),
-          publication: PUBLICATION_ID,
+          publication: sAndB.id,
           title: decodeEntities(post.title_plain).trim(),
           datePublished: new Date(post.date).getTime(),
           dateEdited: new Date(post.modified).getTime(),
@@ -183,7 +182,7 @@ const fetchSAndB = async () => {
                 .map(async fetchedArticle => {
                   const articleCursor = articlesCollection.find({
                     id: fetchedArticle.id,
-                    publication: PUBLICATION_ID
+                    publication: sAndB.id
                   })
                   if (await articleCursor.hasNext()) {
                     // Maybe update the article
