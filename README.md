@@ -30,6 +30,9 @@ the dropdown.
 
 ### Production Environment
 
+First, create a production configuration or copy the example file with
+`cp docker-compose.prod.yml{.example,}`.
+
 Run `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build`
 to start a production server. Alternatively, run `./restart.sh` to run
 production in the background. Either way, the production api will be
