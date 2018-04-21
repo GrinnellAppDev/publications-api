@@ -151,26 +151,33 @@ const fetchSAndB = async () => {
   }
 
   try {
+    let numNewArticles = 0
+    let numUpdatedArticles = 0
+
+    const NUM_PAGES = 5
+    const PAGE_SIZE = 400
+    const pageNumbersToFetch = []
+    for (let i = 0; i < NUM_PAGES; i++) {
+      pageNumbersToFetch[i] = i + 1
+    }
+
+    console.info(`Scanning past ${NUM_PAGES * PAGE_SIZE} articles...`)
+
+    const fetchedPages = await Promise.all(
+      pageNumbersToFetch.map(
+        async pageNumber =>
+          await fetchArticles(pageNumber, PAGE_SIZE).catch(
+            err => (console.error(err), [])
+          )
+      )
+    )
+
     await runWithDB(async db => {
       const articlesCollection = db.collection("articles")
 
-      let numNewArticles = 0
-      let numUpdatedArticles = 0
-
-      const NUM_PAGES = 5
-      const PAGE_SIZE = 400
-      const pageNumbersToFetch = []
-      for (let i = 0; i < NUM_PAGES; i++) {
-        pageNumbersToFetch[i] = i + 1
-      }
-
-      console.info(`Scanning past ${NUM_PAGES * PAGE_SIZE} articles...`)
-
       await Promise.all(
-        pageNumbersToFetch
-          .map(async pageNumber => {
-            const articlesFetched = await fetchArticles(pageNumber, PAGE_SIZE)
-
+        fetchedPages
+          .map(async articlesFetched => {
             await Promise.all(
               articlesFetched
                 .map(async fetchedArticle => {
