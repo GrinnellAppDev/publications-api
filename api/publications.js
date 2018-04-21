@@ -101,7 +101,6 @@ module.exports = Router()
         }
       })
 
-      const publicationsCollection = db.collection("publications")
       const articlesCollection = db.collection("articles")
 
       /** @type {number} */ const pageSize = +request.query.pageSize || 10
@@ -117,13 +116,7 @@ module.exports = Router()
         }
       }
 
-      const publicationExists = await publicationsCollection
-        .find({
-          _id: publicationId
-        })
-        .hasNext()
-
-      if (!publicationExists) {
+      if (!publicationsAvailable.items.some(({ id }) => id === publicationId)) {
         throw new HTTPError(404, `No publication with id "${publicationId}".`)
       }
 
@@ -218,19 +211,12 @@ module.exports = Router()
         }
       })
 
-      const publicationsCollection = db.collection("publications")
       const articlesCollection = db.collection("articles")
 
       /** @type {string} */ const publicationId = request.params.publicationId
       /** @type {string} */ const articleId = request.params.articleId
 
-      const publicationExists = await publicationsCollection
-        .find({
-          _id: publicationId
-        })
-        .hasNext()
-
-      if (!publicationExists) {
+      if (!publicationsAvailable.items.some(({ id }) => id === publicationId)) {
         throw new HTTPError(404, `No publication with id "${publicationId}".`)
       }
 
