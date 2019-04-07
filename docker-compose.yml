@@ -2,27 +2,31 @@ version: "3.1"
 
 services:
   api:
+    container_name: sparc-api
     image: sparc-api
     build: ./api
-    networks:
-      - default
-      - api
     depends_on:
       - apidb
     environment:
       - MONGO_URL=mongodb://apidb/
 
+  fetch:
+    container_name: sparc-fetch
+    image: sparc-fetch
+    build: ./api
+    depends_on:
+      - apidb
+    environment:
+      - MONGO_URL=mongodb://apidb/
+    command: [node, fetch.js]
+
   apidb:
     container_name: sparc-apidb
     image: mongo:3.4
-    networks:
-      - api
     volumes:
       - apidb-data:/data/db
     expose:
       - "27017"
+
 volumes:
   apidb-data:
-
-networks:
-  api:

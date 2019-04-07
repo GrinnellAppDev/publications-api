@@ -6,5 +6,10 @@ services:
     restart: unless-stopped
     ports:
       - "8021:80"
+
+  fetch:
+    container_name: sparc-fetch-prod
+    restart: unless-stopped
+
   apidb:
     restart: unless-stopped
