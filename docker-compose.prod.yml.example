@@ -1,3 +1,5 @@
+# Production configuration for docker services
+
 version: "3.1"
 
 services:

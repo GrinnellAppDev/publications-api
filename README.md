@@ -4,6 +4,15 @@
 > [Docker](https://docker.com/), [Node.js](https://nodejs.org/), and
 > [MongoDB](https://mongodb.com/).
 
+## Quick Start
+
+Install [Docker](https://docs.docker.com/install/), then run
+`./quickstart.sh`. The server will become available at
+<http://localhost:4000>.
+
+If you wish to use the "Try it Out" buttons to send requests to live servers,
+be sure to select the appropriate server from the dropdown at the top.
+
 ## Workflow Dependencies
 
 You will need these setup on your machine to manage your workflow.
