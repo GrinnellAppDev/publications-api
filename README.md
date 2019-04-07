@@ -8,22 +8,24 @@
 
 You will need these setup on your machine to manage your workflow.
 
-* [yarn](https://yarnpkg.com/) (`brew install yarn`) or
+- [yarn](https://yarnpkg.com/) (`brew install yarn`) or
   [npm](https://www.npmjs.com/) (`brew install npm`)
-  * Note, the commands below will use `yarn`, but you can substitute in `npm`.
-* [Docker](https://docs.docker.com/install/)
+  - Note, the commands below will use `yarn`, but you can substitute in `npm`.
+- [Docker](https://docs.docker.com/install/)
 
 ## Workflow
 
 ### Install Library Dependencies
 
-To install the dependencies and do initial setup: `yarn install`. You
-should only need to do this when you first clone or package.json is changed.
+To install the dependencies and do initial setup: `cd api` then, `yarn install`.
+You should only need to do this when you first clone or package.json is
+changed.
 
 ### Development Environment
 
-Run `docker-compose up` to start a development server. The api should be
-available at <http://localhost:2000>.
+With the dependencies installed, run `docker-compose up` from the project
+root to start a development server. The api should be available at
+<http://localhost:2000>.
 
 When testing with the docs page, be sure to select the localhost server from
 the dropdown.
@@ -36,7 +38,7 @@ First, create a production configuration or copy the example file with
 Run `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --build`
 to start a production server. Alternatively, run `./restart.sh` to run
 production in the background. Either way, the production api will be
-available on <http://localhost:8001>.
+available at the port specified in the production configuration file.
 
 ### Deploying
 
