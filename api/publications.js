@@ -10,6 +10,7 @@ const {
   numberToBase64,
   HTTPError
 } = require("./util")
+const publicationsAvailable = require("./publications-available")
 
 module.exports = Router()
   /**
@@ -17,27 +18,9 @@ module.exports = Router()
    *  /publications:
    *    get:
    *      summary: Get a list of all publications
-   *      parameters:
-   *        - name: pageSize
-   *          in: query
-   *          description: Maximum number of items per response
-   *          schema:
-   *            type: integer
-   *            default: 10
-   *        - name: pageToken
-   *          in: query
-   *          description: Token representing a particular page of results
-   *          schema:
-   *            type: string
    *      responses:
    *        200:
    *          description: A list of publications
-   *          headers:
-   *            Link:
-   *              schema:
-   *                type: string
-   *              description: >
-   *                Standard HTTP Link header. All URIs relative to the /publications endpoint.
    *          content:
    *            application/json:
    *              schema:
@@ -47,66 +30,12 @@ module.exports = Router()
    *                    type: array
    *                    items:
    *                      $ref: "#/components/schemas/Publication"
-   *                  nextPageToken:
-   *                    type: string
-   *                    nullable: true
-   *        400:
-   *          $ref: "#/components/responses/BadRequest"
    */
-  .get("/", (request, response) =>
-    runWithDB(async db => {
-      validateRequest(request, {
-        querySchemaProps: {
-          pageSize: { type: "string", pattern: "^\\d+$" },
-          pageToken: { type: "string", format: "urlsafeBase64" }
-        }
-      })
-
-      const publicationsCollection = db.collection("publications")
-
-      /** @type {number} */ const pageSize = +request.query.pageSize || 10
-      /** @type {string} */ const pageToken = request.query.pageToken || null
-
-      let pageTokenValue = null
-      if (pageToken) {
-        try {
-          pageTokenValue = base64ToId(pageToken)
-        } catch (error) {
-          throw new HTTPError(400, "Invalid pageToken.")
-        }
-      }
-
-      const allPublications = pageToken
-        ? publicationsCollection.find({ _id: { $lte: pageTokenValue } })
-        : publicationsCollection.find()
-
-      const readPublications = await allPublications
-        .sort("_id", -1)
-        .limit(pageSize + 1)
-        .toArray()
-
-      const items = readPublications.slice(0, pageSize).map(publication => ({
-        id: publication._id,
-        name: publication.name
-      }))
-
-      const nextPageFirstPublication = readPublications[pageSize]
-      let nextPageToken = null
-
-      if (nextPageFirstPublication) {
-        nextPageToken = idToBase64(nextPageFirstPublication._id)
-
-        response.links({
-          next: `publications?${querystring.stringify({
-            ...request.query,
-            pageToken: nextPageToken
-          })}`
-        })
-      }
-
-      response.status(200).send({ items, nextPageToken })
+  .get("/", (request, response) => {
+    response.status(200).send({
+      items: publicationsAvailable.items
     })
-  )
+  })
 
   /**
    * @swagger
@@ -172,7 +101,6 @@ module.exports = Router()
         }
       })
 
-      const publicationsCollection = db.collection("publications")
       const articlesCollection = db.collection("articles")
 
       /** @type {number} */ const pageSize = +request.query.pageSize || 10
@@ -188,13 +116,7 @@ module.exports = Router()
         }
       }
 
-      const publicationExists = await publicationsCollection
-        .find({
-          _id: publicationId
-        })
-        .hasNext()
-
-      if (!publicationExists) {
+      if (!publicationsAvailable.items.some(({ id }) => id === publicationId)) {
         throw new HTTPError(404, `No publication with id "${publicationId}".`)
       }
 
@@ -289,19 +211,12 @@ module.exports = Router()
         }
       })
 
-      const publicationsCollection = db.collection("publications")
       const articlesCollection = db.collection("articles")
 
       /** @type {string} */ const publicationId = request.params.publicationId
       /** @type {string} */ const articleId = request.params.articleId
 
-      const publicationExists = await publicationsCollection
-        .find({
-          _id: publicationId
-        })
-        .hasNext()
-
-      if (!publicationExists) {
+      if (!publicationsAvailable.items.some(({ id }) => id === publicationId)) {
         throw new HTTPError(404, `No publication with id "${publicationId}".`)
       }
 
