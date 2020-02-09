@@ -241,6 +241,7 @@ module.exports = Router()
 
       response.status(200).send({
         id: article.id,
+        url: article.url
         publication: article.publication,
         title: article.title,
         datePublished: article.datePublished,

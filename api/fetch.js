@@ -131,8 +131,10 @@ const fetchSAndB = async () => {
         const AVERAGE_WORDS_PER_MINUTE = 300
         const readTimeMinutes = Math.ceil(wordCount / AVERAGE_WORDS_PER_MINUTE)
 
+        //console.info(`${post.url}`)
         return {
           id: String(post.id),
+          url: String(post.url),
           publication: sAndB.id,
           title: decodeEntities(post.title_plain).trim(),
           datePublished: new Date(post.date).getTime(),
@@ -149,12 +151,14 @@ const fetchSAndB = async () => {
     )
   }
 
+
   try {
     let numNewArticles = 0
     let numUpdatedArticles = 0
 
     const NUM_PAGES = 5
-    const PAGE_SIZE = 400
+    //const PAGE_SIZE = 400
+    const PAGE_SIZE = 1 
     const pageNumbersToFetch = []
     for (let i = 0; i < NUM_PAGES; i++) {
       pageNumbersToFetch[i] = i + 1
@@ -216,6 +220,8 @@ const fetchSAndB = async () => {
         `Success.  Found ${numNewArticles} new articles.  Updated ${numUpdatedArticles} articles.`
       )
     })
+    /*
+    */
   } catch (error) {
     console.error(error)
   } finally {
@@ -223,6 +229,7 @@ const fetchSAndB = async () => {
   }
 }
 
+/*
 const UTC_TO_CST_OFFSET = 6
 schedule.scheduleJob(
   "fetch-s-and-b",
@@ -230,5 +237,6 @@ schedule.scheduleJob(
   { hour: 5 + UTC_TO_CST_OFFSET, minute: 0 },
   fetchSAndB
 )
+*/
 
 fetchSAndB()
