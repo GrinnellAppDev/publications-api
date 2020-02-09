@@ -157,8 +157,8 @@ const fetchSAndB = async () => {
     let numUpdatedArticles = 0
 
     const NUM_PAGES = 5
-    //const PAGE_SIZE = 400
-    const PAGE_SIZE = 1 
+    const PAGE_SIZE = 400
+    //const PAGE_SIZE = 10
     const pageNumbersToFetch = []
     for (let i = 0; i < NUM_PAGES; i++) {
       pageNumbersToFetch[i] = i + 1
@@ -230,6 +230,7 @@ const fetchSAndB = async () => {
 }
 
 /*
+*/
 const UTC_TO_CST_OFFSET = 6
 schedule.scheduleJob(
   "fetch-s-and-b",
@@ -237,6 +238,5 @@ schedule.scheduleJob(
   { hour: 5 + UTC_TO_CST_OFFSET, minute: 0 },
   fetchSAndB
 )
-*/
 
 fetchSAndB()
